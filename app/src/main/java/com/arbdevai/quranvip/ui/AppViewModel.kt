@@ -25,7 +25,7 @@ enum class AppScreen { HOME, QURAN, PRAYER, BOOKMARKS, SETTINGS, TASBIH }
 
 data class UiState(
     val screen: AppScreen = AppScreen.HOME,
-    val preferences: Preferences = Preferences(),
+    val preferences: UserPreferences = UserPreferences(),
     val preferencesReady: Boolean = false,
     val message: String? = null,
     val surahs: List<Surah> = emptyList(),

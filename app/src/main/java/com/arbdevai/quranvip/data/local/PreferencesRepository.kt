@@ -26,11 +26,11 @@ class PreferencesRepository(private val context: Context) {
         val TASBIH = intPreferencesKey("tasbih")
     }
 
-    val stream: Flow<Preferences> = context.dataStore.data.map { prefs ->
+    val stream: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
         val city = prefs[Keys.CITY]?.let { runCatching { json.decodeFromString<City>(it) }.getOrNull() }
         val lastRead = prefs[Keys.LAST_READ]?.let { runCatching { json.decodeFromString<ReadingPosition>(it) }.getOrNull() }
         val bookmarks = prefs[Keys.BOOKMARKS]?.let { runCatching { json.decodeFromString<List<Bookmark>>(it) }.getOrNull() } ?: emptyList()
-        Preferences(
+        UserPreferences(
             qori = prefs[Keys.QORI] ?: "05",
             fontSize = prefs[Keys.FONT_SIZE] ?: 28,
             showLatin = prefs[Keys.SHOW_LATIN] ?: true,

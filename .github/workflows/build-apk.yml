@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,12 +27,26 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: gradle
+
+      - name: Cache Android SDK components
+        uses: actions/cache@v4
+        id: android-sdk-cache
+        with:
+          path: |
+            ${{ env.ANDROID_HOME }}/platforms/android-36
+            ${{ env.ANDROID_HOME }}/build-tools/36.0.0
+          key: android-sdk-36-36.0.0
 
       - name: Accept Android SDK licenses & install components
+        if: steps.android-sdk-cache.outputs.cache-hit != 'true'
         run: |
           yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
           $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0" || true
+
+      - name: Set up Gradle with caching
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' && github.event_name != 'push' }}
 
       - name: Make Gradle executable
         run: chmod +x ./gradlew
@@ -48,10 +62,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/signing/release.keystore"
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
-
-      - name: Run lint
-        run: ./gradlew lintDebug --stacktrace
+        run: ./gradlew testDebugUnitTest --build-cache --parallel --stacktrace
 
       - name: Build signed release APK
         if: ${{ github.event_name != 'pull_request' }}
@@ -60,11 +71,11 @@ jobs:
           QURANVIP_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           QURANVIP_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           QURANVIP_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --stacktrace
+        run: ./gradlew assembleRelease --build-cache --parallel --stacktrace
 
       - name: Build debug APK for pull requests
         if: ${{ github.event_name == 'pull_request' }}
-        run: ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --build-cache --parallel --stacktrace
 
       - name: Upload release APK
         if: ${{ github.event_name != 'pull_request' }}

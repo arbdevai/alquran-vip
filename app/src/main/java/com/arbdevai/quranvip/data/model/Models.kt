@@ -76,7 +76,7 @@ data class Bookmark(val surah: Int, val ayah: Int, val name: String, val arabic:
 data class ReadingPosition(val surah: Int, val ayah: Int, val name: String)
 
 @Serializable
-data class Preferences(
+data class UserPreferences(
     val qori: String = "05",
     val fontSize: Int = 28,
     val showLatin: Boolean = true,
