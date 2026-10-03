@@ -480,6 +480,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
         Spacer(Modifier.height(16.dp))
 
         // Daily Prayer Details
+        val selectedDay = state.selectedPrayerDay
         when {
             state.prayerLoading -> {
                 LoadingView("Memuat jadwal shalat...")
@@ -487,8 +488,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             state.prayerError != null -> {
                 ErrorView(state.prayerError, viewModel::retryPrayer)
             }
-            state.selectedPrayerDay != null -> {
-                val day = state.selectedPrayerDay
+            selectedDay != null -> {
                 GlassCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -499,14 +499,14 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Waktu Salat: ${day.tanggal}",
+                                "Waktu Salat: ${selectedDay.tanggal}",
                                 color = AmberAccent,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         Spacer(Modifier.height(12.dp))
-                        day.times().forEach { (name, time) ->
+                        selectedDay.times().forEach { (name, time) ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
