@@ -1,45 +1,41 @@
 package com.arbdevai.quranvip.data.repository
 
-import com.arbdevai.quranvip.data.model.CalendarData
-import com.arbdevai.quranvip.data.model.City
-import com.arbdevai.quranvip.data.model.PrayerData
+import com.arbdevai.quranvip.data.local.ResponseCache
+import com.arbdevai.quranvip.data.model.*
 import com.arbdevai.quranvip.data.remote.MuslimApi
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.ZoneId
 
-class PrayerRepository(private val api: MuslimApi) {
-    private var allCities: List<City>? = null
-
-    suspend fun getCities(): List<City> {
-        allCities?.let { return it }
-        val response = api.cities()
-        return response.requireData().also { allCities = it }
+class PrayerRepository(private val api: MuslimApi, private val cache: ResponseCache) {
+    suspend fun getCities(): List<City> = cache.get("cities_v3", 30L * 86400000) {
+        api.cities().requireData()
     }
 
-    suspend fun searchCities(keyword: String): List<City> {
-        val trimmed = keyword.trim()
-        if (trimmed.isBlank()) return getCities()
-        val response = api.searchCities(trimmed)
-        return response.data ?: emptyList()
+    suspend fun searchCities(keyword: String): List<City> = getCities().filter {
+        it.lokasi.contains(keyword.trim(), ignoreCase = true)
     }
 
-    suspend fun getPrayerToday(cityId: String, timeZone: String): PrayerData {
-        val response = api.prayerToday(cityId, timeZone)
-        return response.requireData()
-    }
+    suspend fun getPrayerToday(cityId: String, timeZone: String): PrayerData =
+        getPrayerMonth(cityId, YearMonth.now(ZoneId.of(timeZone)), timeZone)
 
-    suspend fun getPrayerMonth(cityId: String, yearMonth: java.time.YearMonth, timeZone: String): PrayerData {
-        val period = java.time.format.DateTimeFormatter.ofPattern("uuuu-MM").format(yearMonth)
-        val response = api.prayerPeriod(cityId, period, timeZone)
-        return response.requireData()
-    }
+    suspend fun getPrayerMonth(cityId: String, yearMonth: YearMonth, timeZone: String): PrayerData =
+        cache.get("prayer_${cityId}_${yearMonth}_$timeZone", 86400000L) {
+            api.prayerPeriod(cityId, yearMonth.toString(), timeZone).requireData().also { data ->
+                require(data.id == cityId && data.jadwal.keys.any { it.startsWith(yearMonth.toString()) }) {
+                    "Respons jadwal tidak sesuai kota atau bulan yang diminta"
+                }
+            }
+        }
 
-    suspend fun getCalendar(date: java.time.LocalDate, timeZone: String): CalendarData {
-        val dateStr = java.time.format.DateTimeFormatter.ISO_LOCAL_DATE.format(date)
-        val response = api.calendar(dateStr, timeZone)
-        return response.requireData()
-    }
+    suspend fun getCalendar(date: LocalDate, timeZone: String): CalendarData =
+        cache.get("calendar_${date}_$timeZone", 86400000L) {
+            api.calendar(date.toString(), timeZone).requireData().also { data ->
+                require(LocalDate.of(data.ce.year, data.ce.month, data.ce.day) == date) {
+                    "Respons kalender tidak sesuai tanggal yang diminta"
+                }
+            }
+        }
 
-    suspend fun getCalendarToday(timeZone: String): CalendarData {
-        val response = api.calendarToday(timeZone)
-        return response.requireData()
-    }
+    suspend fun getCalendarToday(timeZone: String): CalendarData = getCalendar(LocalDate.now(ZoneId.of(timeZone)), timeZone)
 }

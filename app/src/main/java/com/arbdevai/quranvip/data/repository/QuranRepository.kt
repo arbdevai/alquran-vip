@@ -1,29 +1,30 @@
 package com.arbdevai.quranvip.data.repository
 
+import com.arbdevai.quranvip.data.local.ResponseCache
 import com.arbdevai.quranvip.data.model.Surah
 import com.arbdevai.quranvip.data.model.TafsirSurah
 import com.arbdevai.quranvip.data.remote.EQuranApi
 
-class QuranRepository(private val api: EQuranApi) {
-    private var cachedSurahs: List<Surah>? = null
-    private val surahDetails = mutableMapOf<Int, Surah>()
-    private val tafsirs = mutableMapOf<Int, TafsirSurah>()
+class QuranRepository(private val api: EQuranApi, private val cache: ResponseCache) {
+    private val TTL_SURAHS = 7 * 24 * 60 * 60 * 1000L // 7 days
+    private val TTL_SURAH_DETAIL = 30 * 24 * 60 * 60 * 1000L // 30 days
+    private val TTL_TAFSIR = 30 * 24 * 60 * 60 * 1000L // 30 days
 
     suspend fun getSurahs(): List<Surah> {
-        cachedSurahs?.let { return it }
-        val response = api.surahs()
-        return response.data.also { cachedSurahs = it }
+        return cache.get("quran_surahs", TTL_SURAHS) {
+            api.surahs().data
+        }
     }
 
     suspend fun getSurah(number: Int): Surah {
-        surahDetails[number]?.let { return it }
-        val response = api.surah(number)
-        return response.data.also { surahDetails[number] = it }
+        return cache.get("quran_surah_$number", TTL_SURAH_DETAIL) {
+            api.surah(number).data
+        }
     }
 
     suspend fun getTafsir(number: Int): TafsirSurah {
-        tafsirs[number]?.let { return it }
-        val response = api.tafsir(number)
-        return response.data.also { tafsirs[number] = it }
+        return cache.get("quran_tafsir_$number", TTL_TAFSIR) {
+            api.tafsir(number).data
+        }
     }
 }
