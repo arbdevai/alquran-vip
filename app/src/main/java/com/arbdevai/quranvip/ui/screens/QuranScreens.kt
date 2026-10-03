@@ -29,7 +29,9 @@ import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.FloatingQuranController
+import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranAyahCard
+import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
@@ -44,52 +46,77 @@ fun QuranScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mo
 
 @Composable
 private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier) {
-    Column(modifier = modifier.fillMaxSize().background(BgCanvas)) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.screenPadding, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text("Al-Qur'an", style = MaterialTheme.typography.titleLarge, color = TextPrimary)
-                Text("Baca dengan tenang, kapan saja", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
-            }
-            IconButton(onClick = { viewModel.setScreen(AppScreen.SETTINGS) }) {
-                Icon(Icons.Default.Tune, contentDescription = "Pengaturan", tint = TextSecondary)
-            }
-        }
-        OutlinedTextField(
-            value = state.surahQuery,
-            onValueChange = viewModel::setSurahQuery,
-            placeholder = { Text("Cari surah...", color = TextPlaceholder) },
-            leadingIcon = { Icon(Icons.Default.Search, null, tint = TextSecondary) },
-            trailingIcon = {
-                if (state.surahQuery.isNotEmpty()) IconButton(onClick = { viewModel.setSurahQuery("") }) {
-                    Icon(Icons.Default.Clear, "Bersihkan", tint = TextSecondary)
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas),
+        contentPadding = PaddingValues(Spacing.screenPadding),
+        verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing)
+    ) {
+        // 1. Hero Card Al-Qur'an
+        item {
+            QuranHeroBanner(
+                title = "Al-Qur'an Al-Karim",
+                subtitle = "114 Surah · 30 Juz · 6236 Ayat",
+                tag = "KITABULLAH",
+                trailingContent = {
+                    FilledIconButton(
+                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(42.dp)
+                    ) {
+                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                    }
                 }
-            },
-            singleLine = true,
-            shape = MaterialTheme.shapes.extraLarge,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedContainerColor = SurfaceInput,
-                unfocusedContainerColor = SurfaceInput,
-                focusedBorderColor = AmberAccent,
-                unfocusedBorderColor = Color.Transparent,
-                focusedTextColor = TextPrimary,
-                unfocusedTextColor = TextPrimary
-            ),
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.screenPadding)
-        )
-        Spacer(Modifier.height(12.dp))
+            )
+        }
+
+        // 2. Glassmorphic Search Bar
+        item {
+            OutlinedTextField(
+                value = state.surahQuery,
+                onValueChange = viewModel::setSurahQuery,
+                placeholder = { Text("Cari nomor atau nama surah...", color = TextPlaceholder, fontSize = 14.sp) },
+                leadingIcon = { Icon(Icons.Default.Search, null, tint = AmberAccent) },
+                trailingIcon = {
+                    if (state.surahQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.setSurahQuery("") }) {
+                            Icon(Icons.Default.Clear, "Bersihkan", tint = TextSecondary)
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(24.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = GlassSurface,
+                    unfocusedContainerColor = GlassSurface,
+                    focusedBorderColor = AmberAccent,
+                    unfocusedBorderColor = GlassBorder,
+                    focusedTextColor = TextPrimary,
+                    unfocusedTextColor = TextPrimary
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        // 3. Surah List Content
         when {
-            state.quranLoading && state.surahs.isEmpty() -> LoadingView("Memuat daftar surah...")
-            state.quranError != null && state.surahs.isEmpty() -> ErrorView(state.quranError, viewModel::loadSurahs)
-            else -> LazyColumn(
-                contentPadding = PaddingValues(horizontal = Spacing.screenPadding, vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(state.filteredSurahs, key = { it.nomor }) { surah -> SurahListItem(surah) { viewModel.openSurah(surah.nomor) } }
-                if (state.filteredSurahs.isEmpty()) item { EmptyView("Surah tidak ditemukan") }
+            state.quranLoading && state.surahs.isEmpty() -> {
+                item { LoadingView("Memuat 114 Surah Al-Qur'an...") }
+            }
+            state.quranError != null && state.surahs.isEmpty() -> {
+                item { ErrorView(state.quranError, viewModel::loadSurahs) }
+            }
+            else -> {
+                items(state.filteredSurahs, key = { it.nomor }) { surah ->
+                    SurahListItem(surah) { viewModel.openSurah(surah.nomor) }
+                }
+                if (state.filteredSurahs.isEmpty()) {
+                    item { EmptyView("Surah \"${state.surahQuery}\" tidak ditemukan") }
+                }
             }
         }
     }
@@ -97,25 +124,52 @@ private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: M
 
 @Composable
 private fun SurahListItem(surah: Surah, onClick: () -> Unit) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
-                modifier = Modifier.size(38.dp).clip(CircleShape).background(SurfacePill),
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(SurfacePill),
                 contentAlignment = Alignment.Center
-            ) { Text("${surah.nomor}", color = AmberAccent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) }
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(surah.namaLatin, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-                Text("${surah.arti} • ${surah.jumlahAyat} ayat • ${surah.tempatTurun}", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+            ) {
+                Text(
+                    text = "${surah.nomor}",
+                    color = AmberAccent,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            Text(surah.nama, style = MaterialTheme.typography.headlineMedium, color = AmberAccent, textAlign = TextAlign.End)
+            Spacer(Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = surah.namaLatin,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = "${surah.arti} • ${surah.jumlahAyat} Ayat • ${surah.tempatTurun}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary
+                )
+            }
+            Text(
+                text = surah.nama,
+                fontFamily = ArabicFontFamily,
+                style = MaterialTheme.typography.headlineMedium,
+                color = AmberAccent,
+                textAlign = TextAlign.End
+            )
         }
     }
 }
@@ -126,94 +180,139 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
     var showReciters by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
     val startIndex = (state.readerStartAyah - 1).coerceAtLeast(0)
+
     LaunchedEffect(reader?.nomor, state.readerStartAyah) {
-        if (reader != null && reader.ayat.isNotEmpty()) listState.scrollToItem(startIndex.coerceAtMost(reader.ayat.lastIndex))
+        if (reader != null && reader.ayat.isNotEmpty()) {
+            listState.scrollToItem(startIndex.coerceAtMost(reader.ayat.lastIndex))
+        }
     }
+
     Column(modifier = modifier.fillMaxSize().background(BgCanvas)) {
-        ReaderTopBar(
-            state = state,
-            onBack = viewModel::closeReader,
-            onReciter = { showReciters = true },
-            onPlayAll = { if (state.playback.playing) viewModel.togglePlayback() else viewModel.playSurah() }
-        )
         when {
-            state.readerLoading -> LoadingView("Memuat surah...")
-            state.readerError != null -> ErrorView(state.readerError, viewModel::retryReader)
-            reader == null -> EmptyView("Surah belum tersedia")
-            else -> Box(Modifier.fillMaxSize()) {
-                LazyColumn(
-                    state = listState,
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 92.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    item {
-                        ReaderHeader(reader)
-                    }
-                    items(reader.ayat, key = { it.nomorAyat }) { ayah ->
-                        val playing = state.playback.playing && state.playback.surah == reader.nomor && state.playback.ayah == ayah.nomorAyat
-                        QuranAyahCard(
-                            ayah = ayah,
-                            fontSize = state.preferences.fontSize,
-                            showLatin = state.preferences.showLatin,
-                            showTranslation = state.preferences.showTranslation,
-                            isBookmarked = state.preferences.bookmarks.any { it.surah == reader.nomor && it.ayah == ayah.nomorAyat },
-                            isPlaying = playing,
-                            onBookmark = { viewModel.toggleBookmark(ayah) },
-                            onPlayAudio = { viewModel.playAyah(ayah.nomorAyat) },
-                            onTafsir = { viewModel.loadTafsir(ayah.nomorAyat) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        LaunchedEffect(ayah.nomorAyat) { snapshotFlow { listState.firstVisibleItemIndex }.collect { index ->
-                            if (index >= 1 && reader.ayat.getOrNull(index - 1)?.nomorAyat == ayah.nomorAyat) viewModel.recordReading(ayah.nomorAyat)
-                        } }
-                    }
+            state.readerLoading -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    LoadingView("Membuka surah...")
                 }
-                FloatingQuranController(
-                    isPlayingAll = state.playback.playing,
-                    onFontDecrease = { viewModel.setFontSize(state.preferences.fontSize - 1) },
-                    onFontIncrease = { viewModel.setFontSize(state.preferences.fontSize + 1) },
-                    onPlayAll = { if (state.playback.playing) viewModel.togglePlayback() else viewModel.playSurah() },
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                )
+            }
+            state.readerError != null -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    ErrorView(state.readerError, viewModel::retryReader)
+                }
+            }
+            reader == null -> {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    EmptyView("Surah belum tersedia")
+                }
+            }
+            else -> {
+                Box(Modifier.fillMaxSize()) {
+                    LazyColumn(
+                        state = listState,
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 96.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // 1. Hero Card Surah Reader Header
+                        item {
+                            QuranHeroBanner(
+                                title = "Surah ${reader.namaLatin}",
+                                subtitle = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
+                                tag = "SURAH KE-${reader.nomor}",
+                                trailingContent = {
+                                    FilledIconButton(
+                                        onClick = { showReciters = true },
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = Color.White.copy(alpha = 0.2f),
+                                            contentColor = Color.White
+                                        ),
+                                        modifier = Modifier.size(38.dp)
+                                    ) {
+                                        Icon(Icons.Default.RecordVoiceOver, contentDescription = "Pilih Qari")
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    FilledIconButton(
+                                        onClick = viewModel::closeReader,
+                                        colors = IconButtonDefaults.filledIconButtonColors(
+                                            containerColor = Color.White.copy(alpha = 0.2f),
+                                            contentColor = Color.White
+                                        ),
+                                        modifier = Modifier.size(38.dp)
+                                    ) {
+                                        Icon(Icons.Default.Close, contentDescription = "Tutup")
+                                    }
+                                }
+                            )
+                        }
+
+                        // 2. Bismillah Glassmorphic Card (kecuali Surah At-Taubah no 9 dan Al-Fatihah no 1)
+                        if (reader.nomor != 1 && reader.nomor != 9) {
+                            item {
+                                GlassCard(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
+                                            fontFamily = ArabicFontFamily,
+                                            fontSize = 24.sp,
+                                            color = AmberAccent,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                        // 3. Ayat Cards
+                        items(reader.ayat, key = { it.nomorAyat }) { ayah ->
+                            val playing = state.playback.playing &&
+                                state.playback.surah == reader.nomor &&
+                                state.playback.ayah == ayah.nomorAyat
+                            QuranAyahCard(
+                                ayah = ayah,
+                                fontSize = state.preferences.fontSize,
+                                showLatin = state.preferences.showLatin,
+                                showTranslation = state.preferences.showTranslation,
+                                isBookmarked = state.preferences.bookmarks.any { it.surah == reader.nomor && it.ayah == ayah.nomorAyat },
+                                isPlaying = playing,
+                                onBookmark = { viewModel.toggleBookmark(ayah) },
+                                onPlayAudio = { viewModel.playAyah(ayah.nomorAyat) },
+                                onTafsir = { viewModel.loadTafsir(ayah.nomorAyat) },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            LaunchedEffect(ayah.nomorAyat) {
+                                snapshotFlow { listState.firstVisibleItemIndex }.collect { index ->
+                                    if (index >= 1 && reader.ayat.getOrNull(index - 1)?.nomorAyat == ayah.nomorAyat) {
+                                        viewModel.recordReading(ayah.nomorAyat)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Floating Bottom Controller (Font Size & Play Surah)
+                    FloatingQuranController(
+                        isPlayingAll = state.playback.playing && state.playback.surah == reader.nomor && state.playback.ayah == 0,
+                        onFontDecrease = { viewModel.setFontSize(state.preferences.fontSize - 1) },
+                        onFontIncrease = { viewModel.setFontSize(state.preferences.fontSize + 1) },
+                        onPlayAll = { if (state.playback.playing) viewModel.togglePlayback() else viewModel.playSurah() },
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    )
+                }
             }
         }
     }
-    if (showReciters) ReciterDialog(state, viewModel) { showReciters = false }
-    if (state.tafsirAyah != null) TafsirDialog(state, viewModel)
-}
 
-@Composable
-private fun ReaderTopBar(state: UiState, onBack: () -> Unit, onReciter: () -> Unit, onPlayAll: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Kembali", tint = TextPrimary) }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(state.reader?.namaLatin ?: "Al-Qur'an", style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-            Text(Reciters.names[state.preferences.qori] ?: "Qari Pilihan", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-        }
-        IconButton(onClick = onReciter) { Icon(Icons.Default.RecordVoiceOver, "Pilih qari", tint = AmberAccent) }
-        IconButton(onClick = onPlayAll) {
-            Icon(if (state.playback.playing) Icons.Default.Pause else Icons.Default.PlayArrow, "Putar", tint = AmberAccent)
-        }
+    if (showReciters) {
+        ReciterDialog(state, viewModel) { showReciters = false }
     }
-}
-
-@Composable
-private fun ReaderHeader(reader: Surah) {
-    Card(shape = MaterialTheme.shapes.large, colors = CardDefaults.cardColors(containerColor = SurfaceCard), modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(reader.nama, style = MaterialTheme.typography.displaySmall, color = AmberAccent)
-            Spacer(Modifier.height(4.dp))
-            Text(reader.namaLatin, style = MaterialTheme.typography.titleLarge, color = TextPrimary)
-            Text("${reader.arti} • ${reader.tempatTurun} • ${reader.jumlahAyat} ayat", style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-            if (reader.deskripsi.isNotBlank()) {
-                Spacer(Modifier.height(12.dp))
-                Text(reader.deskripsi, style = MaterialTheme.typography.bodySmall, color = TextSecondary, textAlign = TextAlign.Center, maxLines = 4)
-            }
-        }
+    if (state.tafsirAyah != null) {
+        TafsirDialog(state, viewModel)
     }
 }
 
@@ -221,17 +320,44 @@ private fun ReaderHeader(reader: Surah) {
 private fun ReciterDialog(state: UiState, viewModel: AppViewModel, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Pilih Qari", color = TextPrimary) },
+        title = {
+            Text(
+                "Pilih Qari Audio",
+                style = MaterialTheme.typography.titleLarge,
+                color = TextPrimary
+            )
+        },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 Reciters.names.forEach { (id, name) ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable { viewModel.setQori(id); onDismiss() }.padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                    val isSelected = state.preferences.qori == id
+                    GlassCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        containerColor = if (isSelected) SurfacePill else GlassSurface,
+                        onClick = {
+                            viewModel.setQori(id)
+                            onDismiss()
+                        }
                     ) {
-                        RadioButton(selected = state.preferences.qori == id, onClick = null)
-                        Spacer(Modifier.width(8.dp))
-                        Text(name, color = TextPrimary)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                name,
+                                color = if (isSelected) AmberAccent else TextPrimary,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                            if (isSelected) {
+                                Icon(Icons.Default.Check, null, tint = AmberAccent)
+                            }
+                        }
                     }
                 }
             }
@@ -243,10 +369,16 @@ private fun ReciterDialog(state: UiState, viewModel: AppViewModel, onDismiss: ()
 
 @Composable
 private fun TafsirDialog(state: UiState, viewModel: AppViewModel) {
-    val text = state.tafsir?.tafsir?.firstOrNull { it.ayat == state.tafsirAyah }?.teks
+    val ayahNum = state.tafsirAyah ?: return
+    val text = state.tafsir?.tafsir?.firstOrNull { it.ayat == ayahNum }?.teks
     AlertDialog(
         onDismissRequest = viewModel::dismissTafsir,
-        title = { Text("Tafsir Ayat ${state.tafsirAyah}", color = TextPrimary) },
+        title = {
+            Text(
+                "Tafsir ${state.reader?.namaLatin ?: ""} · Ayat $ayahNum",
+                color = TextPrimary
+            )
+        },
         text = {
             when {
                 state.tafsirLoading -> CircularProgressIndicator(color = AmberAccent)
@@ -262,7 +394,7 @@ private fun TafsirDialog(state: UiState, viewModel: AppViewModel) {
 
 @Composable
 internal fun LoadingView(message: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = AmberAccent)
             Spacer(Modifier.height(12.dp))
@@ -273,20 +405,22 @@ internal fun LoadingView(message: String) {
 
 @Composable
 internal fun ErrorView(message: String?, retry: () -> Unit) {
-    Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(Icons.Default.CloudOff, null, tint = TextSecondary, modifier = Modifier.size(40.dp))
             Spacer(Modifier.height(10.dp))
             Text(message ?: "Terjadi kesalahan", style = MaterialTheme.typography.bodyMedium, color = TextSecondary, textAlign = TextAlign.Center)
-            Spacer(Modifier.height(10.dp))
-            Button(onClick = retry, colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = Color.Black)) { Text("Coba Lagi") }
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = retry, colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = Color.Black)) {
+                Text("Coba Lagi")
+            }
         }
     }
 }
 
 @Composable
 internal fun EmptyView(message: String) {
-    Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
         Text(message, style = MaterialTheme.typography.bodyMedium, color = TextSecondary, textAlign = TextAlign.Center)
     }
 }

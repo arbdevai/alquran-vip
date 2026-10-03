@@ -1,7 +1,6 @@
 package com.arbdevai.quranvip.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +25,7 @@ import com.arbdevai.quranvip.data.model.ReadingPosition
 import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
+import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 
@@ -41,7 +42,7 @@ fun HomeScreen(
         contentPadding = PaddingValues(Spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(Spacing.itemSpacing)
     ) {
-        // 1. Hero Banner
+        // 1. Hero Card (Beranda)
         item {
             val hijriText = state.selectedCalendar?.hijr?.let {
                 "${it.day} ${it.monthName} ${it.year} H"
@@ -49,7 +50,19 @@ fun HomeScreen(
             QuranHeroBanner(
                 title = "Al-Qur'an VIP",
                 subtitle = hijriText,
-                tag = "BISMILLAHIRRAHMANIRRAHIM"
+                tag = "BISMILLAHIRRAHMANIRRAHIM",
+                trailingContent = {
+                    FilledIconButton(
+                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.2f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(42.dp)
+                    ) {
+                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                    }
+                }
             )
         }
 
@@ -64,7 +77,7 @@ fun HomeScreen(
             }
         }
 
-        // 3. Quick Menu Navigation Grid
+        // 3. Quick Menu Navigation Grid (Glassmorphism 2026)
         item {
             Text(
                 text = "Fitur Utama",
@@ -107,7 +120,7 @@ fun HomeScreen(
             }
         }
 
-        // 4. Jadwal Shalat Ringkas Hari Ini (Today's Prayer Widget)
+        // 4. Jadwal Shalat Ringkas Hari Ini (Glassmorphism Widget)
         item {
             TodayPrayerCard(
                 state = state,
@@ -122,12 +135,9 @@ private fun LastReadCard(
     lastRead: ReadingPosition,
     onClick: () -> Unit
 ) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
@@ -190,23 +200,20 @@ private fun MenuGridItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        shape = MaterialTheme.shapes.medium,
-        color = SurfaceCard,
-        modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
-            .clickable(onClick = onClick)
+    GlassCard(
+        modifier = modifier,
+        onClick = onClick
     ) {
         Column(
-            modifier = Modifier.padding(vertical = 12.dp, horizontal = 6.dp),
+            modifier = Modifier.padding(vertical = 14.dp, horizontal = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(46.dp)
                     .clip(CircleShape)
-                    .background(iconTint.copy(alpha = 0.15f)),
+                    .background(iconTint.copy(alpha = 0.18f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -234,12 +241,9 @@ private fun TodayPrayerCard(
     state: UiState,
     onOpenPrayer: () -> Unit
 ) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onOpenPrayer)
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = onOpenPrayer
     ) {
         Column(
             modifier = Modifier
@@ -252,29 +256,37 @@ private fun TodayPrayerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.Mosque,
-                        contentDescription = null,
-                        tint = CatJadwal,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(CatJadwal.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = null,
+                            tint = CatJadwal,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
                     Column {
                         Text(
                             text = "Jadwal Shalat Hari Ini",
                             style = MaterialTheme.typography.titleMedium,
                             color = TextPrimary
                         )
-                        val cityLokasi = state.preferences.city?.lokasi ?: "Belum Memilih Kota"
+                        val cityLokasi = state.preferences.city?.lokasi ?: "Sentuh untuk pilih kota"
                         Text(
                             text = cityLokasi,
                             style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary
+                            color = if (state.preferences.city != null) AmberAccent else TextSecondary
                         )
                     }
                 }
                 TextButton(onClick = onOpenPrayer) {
-                    Text("Lihat Kalender", color = AmberAccent, style = MaterialTheme.typography.labelSmall)
+                    Text("Detail", color = AmberAccent, style = MaterialTheme.typography.labelSmall)
                 }
             }
 
@@ -287,15 +299,15 @@ private fun TodayPrayerCard(
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     times.forEach { (name, time) ->
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .weight(1f)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(SurfaceInput)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color.White.copy(alpha = 0.05f))
                                 .padding(vertical = 8.dp, horizontal = 2.dp)
                         ) {
                             Text(
@@ -307,50 +319,30 @@ private fun TodayPrayerCard(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = time,
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.bodyMedium,
                                 color = AmberAccent,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
                             )
-                        }
-                        if (name != "Isya") {
-                            Spacer(modifier = Modifier.width(6.dp))
                         }
                     }
                 }
-            } else if (state.preferences.city == null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(SurfaceInput)
-                        .padding(14.dp),
-                    contentAlignment = Alignment.Center
+            } else {
+                Surface(
+                    color = Color.White.copy(alpha = 0.04f),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Pilih kota untuk menampilkan jadwal shalat harian",
-                        style = MaterialTheme.typography.bodySmall,
+                        text = if (state.preferences.city == null)
+                            "Pilih kota lokasi Anda untuk menampilkan jadwal shalat otomatis"
+                        else "Memuat waktu shalat hari ini...",
                         color = TextSecondary,
-                        textAlign = TextAlign.Center
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
-            } else if (state.prayerLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(24.dp))
-                }
-            } else {
-                Text(
-                    text = "Ketuk untuk memuat jadwal shalat",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-                )
             }
         }
     }

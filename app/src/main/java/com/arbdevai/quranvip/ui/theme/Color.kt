@@ -36,3 +36,15 @@ val CatTasbih = Color(0xFFF97316)            // Oranye terang
 val CatTahlil = Color(0xFFEC4899)            // Magenta pink
 val CatDoa = Color(0xFF14B8A6)               // Teal
 val CatHadroh = Color(0xFF6366F1)            // Indigo / Ungu
+
+// ==========================================
+// 5. Modern Glassmorphism 2026 Tokens
+// ==========================================
+val GlassBackground = Color(0xB8121418)       // Frosted dark background
+val GlassSurface = Color(0xCC16191F)          // Translucent card surface
+val GlassNavbar = Color(0xF2121419)           // Translucent floating navbar
+val GlassBorder = Color(0x2EFFFFFF)           // Specular highlight border
+val GlassBorderGlow = Color(0x40FF9E00)       // Amber accent glow border
+val GlassHighlight = Color(0x14FFFFFF)        // Top rim lighting
+val GlassCardPressed = Color(0xDE1F232B)      // Active glass state
+

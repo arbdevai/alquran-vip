@@ -34,10 +34,11 @@ fun QuranAyahCard(
     onTafsir: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = if (isPlaying) SurfaceInput else SurfaceCard),
-        modifier = modifier.fillMaxWidth()
+    GlassCard(
+        modifier = modifier.fillMaxWidth(),
+        containerColor = if (isPlaying) GlassCardPressed else GlassSurface,
+        borderColor = if (isPlaying) AmberAccent else GlassBorder,
+        borderWidth = if (isPlaying) 1.5.dp else 1.dp
     ) {
         Column(
             modifier = Modifier
@@ -51,15 +52,15 @@ fun QuranAyahCard(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(SurfacePill),
+                        .background(if (isPlaying) AmberAccent else SurfacePill),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "${ayah.nomorAyat}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.White
+                        color = if (isPlaying) Color.Black else Color.White
                     )
                 }
 
