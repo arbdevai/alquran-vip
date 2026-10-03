@@ -17,12 +17,12 @@ if (signingPropertiesFile.exists()) {
 
 android {
     namespace = "com.arbdevai.quranvip"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.arbdevai.quranvip"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
