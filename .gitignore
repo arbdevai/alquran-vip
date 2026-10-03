@@ -1,0 +1,19 @@
+.gradle/
+.kotlin/
+**/build/
+local.properties
+.idea/
+*.iml
+.signing/
+keystore/
+*.jks
+*.keystore
+*.p12
+*.pem
+.env*
+! .env.example
+*.apk
+*.aab
+artifacts/
+# Reference supplied locally; do not redistribute the full external specification.
+apimuslim.json
