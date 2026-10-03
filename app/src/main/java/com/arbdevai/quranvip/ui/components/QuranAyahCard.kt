@@ -106,14 +106,14 @@ fun QuranAyahCard(
             // 1. Teks Arab Al-Qur'an (RTL, LineHeightStyle centered so diacritics never clip)
             Text(
                 text = ayah.teksArab,
-                fontSize = fontSize.sp,
-                lineHeight = (fontSize * 1.95f).sp,
-                lineHeightStyle = ArabicLineHeightStyle,
-                fontFamily = ArabicFontFamily,
-                fontWeight = FontWeight.Normal,
                 color = TextPrimary,
                 textAlign = TextAlign.End,
                 style = TextStyle(
+                    fontFamily = ArabicFontFamily,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = fontSize.sp,
+                    lineHeight = (fontSize * 1.95f).sp,
+                    lineHeightStyle = ArabicLineHeightStyle,
                     textDirection = TextDirection.Rtl,
                     platformStyle = PlatformTextStyle(includeFontPadding = false)
                 ),
