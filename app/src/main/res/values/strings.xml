@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Al-Qur'an VIP</string>
+    <string name="app_name">Al-Qur’an VIP</string>
     <string name="location_permission_rationale">Izinkan lokasi agar jadwal salat sesuai kota Anda. Lokasi tidak dikirim atau disimpan sebagai koordinat.</string>
 </resources>

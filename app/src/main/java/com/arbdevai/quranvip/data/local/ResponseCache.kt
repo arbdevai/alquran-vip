@@ -18,9 +18,9 @@ abstract class ResponseDatabase : RoomDatabase() {
     abstract fun responses(): ResponseDao
 }
 class ResponseCache(context: Context) {
-    val json = Json { ignoreUnknownKeys = true }
-    val dao = Room.databaseBuilder(context, ResponseDatabase::class.java, "responses.db").build().responses()
-    val mutex = Mutex()
+    @PublishedApi internal val json = Json { ignoreUnknownKeys = true }
+    @PublishedApi internal val dao = Room.databaseBuilder(context, ResponseDatabase::class.java, "responses.db").build().responses()
+    @PublishedApi internal val mutex = Mutex()
     suspend inline fun <reified T> get(key: String, ttl: Long, crossinline fetch: suspend () -> T): T = mutex.withLock {
         val stored = dao.get(key)
         if (stored != null && System.currentTimeMillis() - stored.savedAt < ttl) {
