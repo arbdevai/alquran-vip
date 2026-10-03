@@ -11,7 +11,8 @@ keystore/
 *.p12
 *.pem
 .env*
-! .env.example
+!.env.example
+local-signing.properties
 *.apk
 *.aab
 artifacts/

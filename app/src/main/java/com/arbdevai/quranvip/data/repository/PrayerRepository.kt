@@ -12,8 +12,10 @@ class PrayerRepository(private val api: MuslimApi, private val cache: ResponseCa
         api.cities().requireData()
     }
 
-    suspend fun searchCities(keyword: String): List<City> = getCities().filter {
-        it.lokasi.contains(keyword.trim(), ignoreCase = true)
+    suspend fun searchCities(keyword: String): List<City> {
+        val term = keyword.trim()
+        if (term.isBlank()) return emptyList()
+        return getCities().filter { it.lokasi.contains(term, ignoreCase = true) }
     }
 
     suspend fun getPrayerToday(cityId: String, timeZone: String): PrayerData =
