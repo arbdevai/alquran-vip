@@ -59,6 +59,7 @@ private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: M
                 title = "Al-Qur'an Al-Karim",
                 subtitle = "114 Surah · 30 Juz · 6236 Ayat",
                 tag = "KITABULLAH",
+                badges = listOf("114 Surah", "30 Juz", "Kemenag RI", "Tafsir Lengkap"),
                 trailingContent = {
                     FilledIconButton(
                         onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
@@ -214,10 +215,12 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                     ) {
                         // 1. Hero Card Surah Reader Header
                         item {
+                            val qoriName = Reciters.names[state.preferences.qori] ?: "Qari Pilihan"
                             QuranHeroBanner(
                                 title = "Surah ${reader.namaLatin}",
                                 subtitle = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
                                 tag = "SURAH KE-${reader.nomor}",
+                                badges = listOf(reader.tempatTurun, "${reader.jumlahAyat} Ayat", qoriName),
                                 trailingContent = {
                                     FilledIconButton(
                                         onClick = { showReciters = true },

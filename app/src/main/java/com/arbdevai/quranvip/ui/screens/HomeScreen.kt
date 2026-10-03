@@ -51,6 +51,7 @@ fun HomeScreen(
                 title = "Al-Qur'an VIP",
                 subtitle = hijriText,
                 tag = "BISMILLAHIRRAHMANIRRAHIM",
+                badges = listOf("114 Surah", "30 Juz", state.preferences.city?.lokasi ?: "Jadwal Shalat"),
                 trailingContent = {
                     FilledIconButton(
                         onClick = { viewModel.setScreen(AppScreen.SETTINGS) },

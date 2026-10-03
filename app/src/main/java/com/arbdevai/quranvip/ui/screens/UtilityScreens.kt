@@ -49,7 +49,8 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
             QuranHeroBanner(
                 title = "Ayat Favorit",
                 subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
-                tag = "TADARUS PRIBADI"
+                tag = "TADARUS PRIBADI",
+                badges = listOf("${state.preferences.bookmarks.size} Disimpan", "Tadarus Harian")
             )
         }
 
@@ -126,7 +127,8 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
         QuranHeroBanner(
             title = "Tasbih Digital VIP",
             subtitle = selectedZikir,
-            tag = "ZIKIR HARIAN"
+            tag = "ZIKIR HARIAN",
+            badges = listOf("Haptic Feedback", "Target 33x / 99x", "Hitungan: ${state.preferences.tasbih}")
         )
 
         Spacer(Modifier.height(20.dp))
@@ -223,10 +225,12 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             .padding(Spacing.screenPadding)
     ) {
         // 1. Hero Card Settings
+        val qoriName = Reciters.names[state.preferences.qori] ?: "Qari Pilihan"
         QuranHeroBanner(
             title = "Pengaturan VIP",
             subtitle = "Preferensi Bacaan, Qari, & Waktu",
-            tag = "PREFERENSI APLIKASI"
+            tag = "PREFERENSI APLIKASI",
+            badges = listOf(qoriName, "${state.preferences.fontSize} sp", state.preferences.zone)
         )
 
         Spacer(Modifier.height(16.dp))
@@ -350,6 +354,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             title = "Jadwal Salat Digital",
             subtitle = "$cityLokasi · $hijriSummary",
             tag = "API MUSLIM V3",
+            badges = listOf(state.preferences.city?.lokasi ?: "Lokasi GPS", state.preferences.zone, "Kemenag RI"),
             trailingContent = {
                 FilledIconButton(
                     onClick = { cityDialog = true },

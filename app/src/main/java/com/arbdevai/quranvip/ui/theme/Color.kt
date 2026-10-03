@@ -23,9 +23,10 @@ val EmeraldGradientEnd = Color(0xFF139E77)   // Banner gradien kanan-bawah
 // 3. Tipografi & Konten Teks
 // ==========================================
 val TextPrimary = Color(0xFFFFFFFF)          // Teks ayat Arab & judul tebal
-val TextSecondary = Color(0xFF9E9E9E)        // Terjemahan & metadata surah
-val TextTransliteration = Color(0xFFFF9E00)  // Kalimat transliterasi Latin fonetik
-val TextPlaceholder = Color(0xFF656A72)      // Teks placeholder search
+val TextTranslation = Color(0xFFC8CCD4)      // Terjemahan Indonesia dengan daya baca tinggi
+val TextSecondary = Color(0xFF9AA0A6)        // Metadata & sub-info halus
+val TextTransliteration = Color(0xFFE8C988)  // Emas pasir lembut untuk transliterasi fonetik
+val TextPlaceholder = Color(0xFF636B78)      // Teks placeholder search
 
 // ==========================================
 // 4. Kategori Menu Beranda (Grid Icons)

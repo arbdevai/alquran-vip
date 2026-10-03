@@ -15,7 +15,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.data.model.Ayah
@@ -45,6 +50,7 @@ fun QuranAyahCard(
                 .fillMaxWidth()
                 .padding(Spacing.cardPadding)
         ) {
+            // Verse Header Row (Number badge + Action Buttons)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -60,6 +66,7 @@ fun QuranAyahCard(
                     Text(
                         text = "${ayah.nomorAyat}",
                         style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
                         color = if (isPlaying) Color.Black else Color.White
                     )
                 }
@@ -76,7 +83,7 @@ fun QuranAyahCard(
                         )
                     }
                     IconButton(onClick = onTafsir, modifier = Modifier.size(38.dp)) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "Tafsir", tint = TextSecondary)
+                        Icon(Icons.Default.MoreVert, contentDescription = "Tafsir Kemenag", tint = TextSecondary)
                     }
                     FilledIconButton(
                         onClick = onPlayAudio,
@@ -94,25 +101,49 @@ fun QuranAyahCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // 1. Teks Arab Al-Qur'an (RTL, LineHeightStyle centered so diacritics never clip)
             Text(
                 text = ayah.teksArab,
                 fontSize = fontSize.sp,
-                lineHeight = (fontSize + 22).sp,
+                lineHeight = (fontSize * 1.95f).sp,
+                lineHeightStyle = ArabicLineHeightStyle,
                 fontFamily = ArabicFontFamily,
+                fontWeight = FontWeight.Normal,
                 color = TextPrimary,
                 textAlign = TextAlign.End,
+                style = TextStyle(
+                    textDirection = TextDirection.Rtl,
+                    platformStyle = PlatformTextStyle(includeFontPadding = false)
+                ),
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // 2. Transliterasi Latin Fonetik (Golden Sand, Italic, Relaxed Line Height)
             if (showLatin) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(text = ayah.teksLatin, style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(14.dp))
+                Text(
+                    text = ayah.teksLatin,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontStyle = FontStyle.Italic
+                    ),
+                    color = TextTransliteration,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
+            // 3. Terjemahan Bahasa Indonesia (High-legibility neutral gray, 22sp line height)
             if (showTranslation) {
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(text = ayah.teksIndonesia, style = MaterialTheme.typography.bodySmall)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = ayah.teksIndonesia,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextTranslation,
+                    lineHeight = 22.sp,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
