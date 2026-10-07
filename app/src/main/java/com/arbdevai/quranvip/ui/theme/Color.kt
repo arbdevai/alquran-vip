@@ -2,40 +2,70 @@ package com.arbdevai.quranvip.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// A warm, restrained night palette. Black is reserved for the canvas; contrast is created
-// with quiet tonal layers rather than bright borders or repeated gradients.
-val BgCanvas = Color(0xFF0B0C0E)
-val SurfaceCard = Color(0xFF141518)
-val SurfaceRaised = Color(0xFF1A1C20)
-val SurfaceInput = Color(0xFF1C1E22)
-val SurfacePill = Color(0xFF25272C)
-val BorderSubtle = Color(0xFF2A2C31)
+// ==========================================
+// 1. Root Canvas & Rich AMOLED Dark Surfaces
+// ==========================================
+val BgCanvas = Color(0xFF000000)             // Pure pitch black AMOLED
+val SurfaceCard = Color(0xFF14171E)          // Deep slate card surface
+val SurfaceRaised = Color(0xFF1C2028)        // Raised surface for dialogs & popups
+val SurfaceInput = Color(0xFF181B22)         // Search bar & input fields
+val SurfacePill = Color(0xFF222631)          // Pill badges & chips
+val BorderSubtle = Color(0x1FFFFFFF)         // 12% white outline border
 
-// One accent, used intentionally: navigation selection, primary action, and current state.
-val AmberAccent = Color(0xFFE5C378)
-val AmberPressed = Color(0xFFCDAA5F)
-val EmeraldGradientStart = Color(0xFF225F4C)
-val EmeraldGradientEnd = Color(0xFF183D35)
+// ==========================================
+// 2. Signature Emerald-Teal Identity (Yasin)
+// ==========================================
+val EmeraldGradientStart = Color(0xFF075E54) // Deep Islamic green
+val EmeraldGradientMid = Color(0xFF087F67)   // Vibrant emerald teal
+val EmeraldGradientEnd = Color(0xFF10A37F)   // Fresh luminous mint
 
-val TextPrimary = Color(0xFFF4F1EA)
-val TextTranslation = Color(0xFFD1D4DA)
-val TextSecondary = Color(0xFF9CA1AA)
-val TextTransliteration = Color(0xFFDCC99A)
-val TextPlaceholder = Color(0xFF70757E)
+// Warm Gold / Amber Accent for active states & highlights
+val AmberAccent = Color(0xFFFFB020)          // Luminous warm amber gold
+val AmberPressed = Color(0xFFE59807)         // Pressed state
+val AmberSoft = Color(0x2BFFB020)            // Glow / background wash
 
-val CatQuran = Color(0xFF88AEEA)
-val CatJadwal = Color(0xFF75BDA2)
-val CatTasbih = Color(0xFFE2A365)
-val CatTahlil = Color(0xFFD89DB6)
-val CatDoa = Color(0xFF72BDB5)
-val CatHadroh = Color(0xFF9EA9E6)
+// ==========================================
+// 3. Typographic Text Hierarchy
+// ==========================================
+val TextPrimary = Color(0xFFFFFFFF)          // Pure white for Arabic verses & titles
+val TextTransliteration = Color(0xFFFFB020)  // Warm golden transliteration
+val TextTranslation = Color(0xFFCBD5E1)      // Crisp silver-gray for Indonesian translation
+val TextSecondary = Color(0xFF94A3B8)        // Slate metadata & captions
+val TextPlaceholder = Color(0xFF64748B)      // Search hints
 
-// Legacy names retained for component compatibility. They now express a quiet tonal layer,
-// not high-gloss glass decoration.
-val GlassBackground = Color(0xE00B0C0E)
-val GlassSurface = SurfaceCard
-val GlassNavbar = Color(0xF0141518)
-val GlassBorder = BorderSubtle
-val GlassBorderGlow = AmberAccent.copy(alpha = 0.32f)
-val GlassHighlight = Color.White.copy(alpha = 0.04f)
-val GlassCardPressed = Color(0xFF222016)
+// ==========================================
+// 4. Feature Tile Icon Gradients (Yasin Style)
+// ==========================================
+val TileQuranStart = Color(0xFF0A84FF)
+val TileQuranEnd = Color(0xFF5AC8FA)
+
+val TileJadwalStart = Color(0xFF30D158)
+val TileJadwalEnd = Color(0xFF00C7BE)
+
+val TileTasbihStart = Color(0xFFFF9F0A)
+val TileTasbihEnd = Color(0xFFFF453A)
+
+val TileBookmarkStart = Color(0xFFFF375F)
+val TileBookmarkEnd = Color(0xFFBF5AF2)
+
+val TileSettingsStart = Color(0xFF5E5CE6)
+val TileSettingsEnd = Color(0xFF64D2FF)
+
+// Category colors for backwards compatibility
+val CatQuran = Color(0xFF0A84FF)
+val CatJadwal = Color(0xFF30D158)
+val CatTasbih = Color(0xFFFF9F0A)
+val CatTahlil = Color(0xFFFF375F)
+val CatDoa = Color(0xFF00C7BE)
+val CatHadroh = Color(0xFF5E5CE6)
+
+// ==========================================
+// 5. Modern Translucent Dock & Card Tokens
+// ==========================================
+val GlassBackground = Color(0xB8121418)
+val GlassSurface = Color(0xDB161A22)          // Rich translucent card
+val GlassNavbar = Color(0xF2141720)           // Floating island navigation bar
+val GlassBorder = Color(0x29FFFFFF)           // Specular rim border (16% white)
+val GlassBorderGlow = Color(0x52FFB020)       // Warm gold active glow
+val GlassHighlight = Color(0x1FFFFFFF)
+val GlassCardPressed = Color(0xEE1E232F)

@@ -5,131 +5,379 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.data.model.ReadingPosition
 import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
-import com.arbdevai.quranvip.ui.components.CalmIconTile
-import com.arbdevai.quranvip.ui.components.CalmRowItem
-import com.arbdevai.quranvip.ui.components.CalmScreenTitle
-import com.arbdevai.quranvip.ui.components.CalmSection
-import com.arbdevai.quranvip.ui.components.CalmTimeBlock
-import com.arbdevai.quranvip.ui.components.QuietIconButton
+import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranHeroBanner
-import com.arbdevai.quranvip.ui.theme.AmberAccent
-import com.arbdevai.quranvip.ui.theme.BgCanvas
-import com.arbdevai.quranvip.ui.theme.CatJadwal
-import com.arbdevai.quranvip.ui.theme.SurfaceCard
-import com.arbdevai.quranvip.ui.theme.TextPrimary
-import com.arbdevai.quranvip.ui.theme.TextSecondary
+import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
 fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(BgCanvas),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(22.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // 1. Signature Emerald Hero Banner (Yasin style with subtle ۞ & Hijri date)
         item {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                CalmScreenTitle(
-                    title = "Assalamu'alaikum",
-                    subtitle = state.selectedCalendar?.hijr?.today ?: "Semoga hari ini diberkahi",
-                    modifier = Modifier.weight(1f)
-                )
-                QuietIconButton(Icons.Default.Tune, "Pengaturan", onClick = { viewModel.setScreen(AppScreen.SETTINGS) })
-            }
-        }
+            val hijriText = state.selectedCalendar?.hijr?.let {
+                "${it.day} ${it.monthName} ${it.year} H"
+            } ?: "Jadwal Salat & Al-Qur'an Digital"
+            val cityText = state.preferences.city?.lokasi ?: "Lokasi GPS Otomatis"
 
-        // Home alone earns a modest hero because it gives a useful at-a-glance prayer context.
-        item {
-            val city = state.preferences.city?.lokasi ?: "Pilih lokasi untuk jadwal salat"
-            val next = state.selectedPrayerDay?.times()?.firstOrNull { it.first == "Subuh" }
             QuranHeroBanner(
-                title = next?.let { "${it.first} · ${it.second}" } ?: "Waktu salat hari ini",
-                subtitle = city,
-                tag = "JADWAL SALAT",
-                badges = if (state.preferences.city == null) listOf("Gunakan GPS atau pilih kota") else listOf("Lihat jadwal lengkap"),
+                title = "Al-Qur'an VIP",
+                subtitle = "$hijriText · $cityText",
+                tag = "BISMILLAHIRRAHMANIRRAHIM",
+                arabicQuote = "اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ",
+                badges = listOf("114 Surah", "30 Juz", "Kemenag RI"),
                 trailingContent = {
-                    QuietIconButton(
-                        icon = Icons.Default.AccessTime,
-                        contentDescription = "Buka jadwal salat",
-                        onClick = { viewModel.setScreen(AppScreen.PRAYER) },
-                        tint = Color.White
-                    )
+                    FilledIconButton(
+                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.Black.copy(alpha = 0.35f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                    }
                 }
             )
         }
 
+        // 2. Terakhir Dibaca Widget (Last Read)
         state.preferences.lastRead?.let { lastRead ->
             item {
-                CalmSection(title = "Lanjutkan membaca") {
-                    CalmRowItem(
-                        leading = { CalmIconTile(Icons.Default.MenuBook, AmberAccent) },
-                        title = lastRead.name,
-                        subtitle = "Ayat ${lastRead.ayah}",
-                        trailing = { Icon(Icons.Default.ArrowForward, null, tint = TextSecondary) },
-                        showDivider = false,
-                        onClick = { viewModel.openSurah(lastRead.surah, lastRead.ayah) }
+                LastReadCard(
+                    lastRead = lastRead,
+                    onClick = { viewModel.openSurah(lastRead.surah, lastRead.ayah) }
+                )
+            }
+        }
+
+        // 3. 2-Column App Grid Menu (Direct inspiration from Sahalarbani/yasin)
+        item {
+            Text(
+                text = "Fitur Utama",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
+            )
+
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Row 1: Al-Qur'an & Jadwal Salat
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FeatureTile(
+                        title = "Al-Qur'an",
+                        subtitle = "114 Surah & Audio Qari",
+                        icon = Icons.Default.MenuBook,
+                        gradient = listOf(TileQuranStart, TileQuranEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.QURAN) }
+                    )
+                    FeatureTile(
+                        title = "Jadwal Salat",
+                        subtitle = "Waktu Adzan & Arah",
+                        icon = Icons.Default.AccessTime,
+                        gradient = listOf(TileJadwalStart, TileJadwalEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.PRAYER) }
+                    )
+                }
+
+                // Row 2: Tasbih Digital & Ayat Favorit
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    FeatureTile(
+                        title = "Tasbih Digital",
+                        subtitle = "Penghitung Zikir Harian",
+                        icon = Icons.Default.TouchApp,
+                        gradient = listOf(TileTasbihStart, TileTasbihEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.TASBIH) }
+                    )
+                    FeatureTile(
+                        title = "Ayat Disimpan",
+                        subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
+                        icon = Icons.Default.Bookmark,
+                        gradient = listOf(TileBookmarkStart, TileBookmarkEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.BOOKMARKS) }
                     )
                 }
             }
         }
 
+        // 4. Jadwal Shalat Hari Ini (Interactive 5 times chips)
         item {
-            CalmSection(title = "Mulai dari sini") {
-                CalmRowItem(
-                    leading = { CalmIconTile(Icons.Default.MenuBook, AmberAccent) },
-                    title = "Baca Al-Qur'an",
-                    subtitle = "Cari dan pilih salah satu dari 114 surah",
-                    trailing = { Icon(Icons.Default.ArrowForward, null, tint = TextSecondary) },
-                    onClick = { viewModel.setScreen(AppScreen.QURAN) }
-                )
-                CalmRowItem(
-                    leading = { CalmIconTile(Icons.Default.AccessTime, CatJadwal) },
-                    title = "Jadwal salat",
-                    subtitle = if (state.preferences.city == null) "Atur lokasi Anda" else state.preferences.city.lokasi,
-                    trailing = { Icon(Icons.Default.ArrowForward, null, tint = TextSecondary) },
-                    showDivider = false,
-                    onClick = { viewModel.setScreen(AppScreen.PRAYER) }
+            TodayPrayerCard(
+                state = state,
+                onOpenPrayer = { viewModel.setScreen(AppScreen.PRAYER) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun LastReadCard(
+    lastRead: ReadingPosition,
+    onClick: () -> Unit
+) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(CircleShape)
+                        .background(AmberAccent.copy(alpha = 0.16f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AutoStories,
+                        contentDescription = null,
+                        tint = AmberAccent,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(14.dp))
+                Column {
+                    Text(
+                        text = "Terakhir Dibaca",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AmberAccent,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Surah ${lastRead.name}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = TextPrimary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = "Ayat ke-${lastRead.ayah}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary
+                    )
+                }
+            }
+            FilledIconButton(
+                onClick = onClick,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = AmberAccent,
+                    contentColor = Color.Black
+                ),
+                modifier = Modifier.size(38.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = "Lanjutkan Membaca"
                 )
             }
         }
+    }
+}
 
-        item {
-            CalmSection(title = "Waktu salat hari ini", actionLabel = "Lihat semua", onAction = { viewModel.setScreen(AppScreen.PRAYER) }) {
-                val day = state.selectedPrayerDay
-                if (day == null) {
-                    Text(
-                        if (state.preferences.city == null) "Pilih kota untuk melihat jadwal salat yang akurat." else "Memuat jadwal salat...",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary,
-                        modifier = Modifier.padding(vertical = 12.dp)
-                    )
-                } else {
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        day.times().filter { it.first in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya") }.forEach { (name, time) ->
-                            CalmTimeBlock(name, time, false, Modifier.weight(1f))
+@Composable
+private fun FeatureTile(
+    title: String,
+    subtitle: String,
+    icon: ImageVector,
+    gradient: List<Color>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    GlassCard(
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp),
+        onClick = onClick
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Brush.linearGradient(gradient)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(14.dp))
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+@Composable
+private fun TodayPrayerCard(
+    state: UiState,
+    onOpenPrayer: () -> Unit
+) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        onClick = onOpenPrayer
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(CatJadwal.copy(alpha = 0.20f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = null,
+                            tint = CatJadwal,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "Jadwal Salat Hari Ini",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                        val cityLokasi = state.preferences.city?.lokasi ?: "Sentuh untuk tentukan kota"
+                        Text(
+                            text = cityLokasi,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (state.preferences.city != null) AmberAccent else TextSecondary
+                        )
+                    }
+                }
+                TextButton(onClick = onOpenPrayer) {
+                    Text("Detail", color = AmberAccent, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            val prayerDay = state.selectedPrayerDay
+            if (prayerDay != null) {
+                val times = prayerDay.times().filter {
+                    it.first in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    times.forEach { (name, time) ->
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(Color.White.copy(alpha = 0.05f))
+                                .padding(vertical = 10.dp, horizontal = 2.dp)
+                        ) {
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = TextSecondary,
+                                fontSize = 11.sp
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = time,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = AmberAccent,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
                         }
                     }
+                }
+            } else {
+                Surface(
+                    color = Color.White.copy(alpha = 0.04f),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = if (state.preferences.city == null)
+                            "Pilih kota atau aktifkan GPS untuk menampilkan jadwal salat otomatis"
+                        else "Memuat waktu salat...",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(14.dp)
+                    )
                 }
             }
         }

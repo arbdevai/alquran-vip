@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -40,8 +39,8 @@ fun GlassCard(
                     Brush.linearGradient(
                         listOf(
                             borderColor,
-                            Color.White.copy(alpha = 0.04f),
-                            Color(0xFFFF9E00).copy(alpha = 0.15f)
+                            Color.White.copy(alpha = 0.05f),
+                            Color(0xFFFFB020).copy(alpha = 0.20f)
                         )
                     )
                 ),

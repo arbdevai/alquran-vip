@@ -2,10 +2,13 @@ package com.arbdevai.quranvip.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
@@ -14,27 +17,27 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.TouchApp
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.ui.screens.*
-import com.arbdevai.quranvip.ui.theme.AmberAccent
-import com.arbdevai.quranvip.ui.theme.BgCanvas
-import com.arbdevai.quranvip.ui.theme.SurfaceCard
-import com.arbdevai.quranvip.ui.theme.TextSecondary
+import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
 fun QuranApp(state: UiState, viewModel: AppViewModel) {
-    BackHandler(enabled = state.reader != null) { viewModel.closeReader() }
+    // Multi-tier Back Button Navigation
+    BackHandler(enabled = state.reader != null) {
+        viewModel.closeReader()
+    }
     BackHandler(enabled = state.reader == null && state.screen != AppScreen.HOME) {
         viewModel.setScreen(AppScreen.HOME)
     }
@@ -45,10 +48,11 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
             .background(BgCanvas)
             .statusBarsPadding()
     ) {
+        // Screen Content Container
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = if (state.reader == null) 76.dp else 0.dp)
+                .padding(bottom = if (state.reader == null) 82.dp else 0.dp)
         ) {
             when (state.screen) {
                 AppScreen.HOME -> HomeScreen(state, viewModel)
@@ -60,21 +64,22 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
             }
         }
 
+        // Floating Island Navigation Bar (Yasin aesthetic translated to native Compose)
         if (state.reader == null) {
-            CalmBottomDock(
+            FloatingIslandNavbar(
                 currentScreen = state.screen,
                 onScreenSelected = viewModel::setScreen,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 10.dp)
+                    .padding(horizontal = 18.dp, vertical = 12.dp)
             )
         }
     }
 }
 
 @Composable
-private fun CalmBottomDock(
+private fun FloatingIslandNavbar(
     currentScreen: AppScreen,
     onScreenSelected: (AppScreen) -> Unit,
     modifier: Modifier = Modifier
@@ -82,27 +87,42 @@ private fun CalmBottomDock(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(58.dp),
-        shape = RoundedCornerShape(22.dp),
-        color = SurfaceCard,
-        shadowElevation = 8.dp
+            .height(64.dp)
+            .border(
+                BorderStroke(
+                    1.dp,
+                    Brush.linearGradient(
+                        listOf(
+                            Color.White.copy(alpha = 0.22f),
+                            Color.White.copy(alpha = 0.05f),
+                            AmberAccent.copy(alpha = 0.35f)
+                        )
+                    )
+                ),
+                RoundedCornerShape(32.dp)
+            ),
+        shape = RoundedCornerShape(32.dp),
+        color = GlassNavbar,
+        shadowElevation = 14.dp
     ) {
         Row(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            DockItem(Icons.Default.Home, "Beranda", currentScreen == AppScreen.HOME) { onScreenSelected(AppScreen.HOME) }
-            DockItem(Icons.Default.MenuBook, "Al-Qur'an", currentScreen == AppScreen.QURAN) { onScreenSelected(AppScreen.QURAN) }
-            DockItem(Icons.Default.AccessTime, "Jadwal", currentScreen == AppScreen.PRAYER) { onScreenSelected(AppScreen.PRAYER) }
-            DockItem(Icons.Default.Bookmark, "Simpan", currentScreen == AppScreen.BOOKMARKS) { onScreenSelected(AppScreen.BOOKMARKS) }
-            DockItem(Icons.Default.TouchApp, "Tasbih", currentScreen == AppScreen.TASBIH) { onScreenSelected(AppScreen.TASBIH) }
+            IslandNavItem(Icons.Default.Home, "Beranda", currentScreen == AppScreen.HOME) { onScreenSelected(AppScreen.HOME) }
+            IslandNavItem(Icons.Default.MenuBook, "Al-Qur'an", currentScreen == AppScreen.QURAN) { onScreenSelected(AppScreen.QURAN) }
+            IslandNavItem(Icons.Default.AccessTime, "Jadwal", currentScreen == AppScreen.PRAYER) { onScreenSelected(AppScreen.PRAYER) }
+            IslandNavItem(Icons.Default.Bookmark, "Simpan", currentScreen == AppScreen.BOOKMARKS) { onScreenSelected(AppScreen.BOOKMARKS) }
+            IslandNavItem(Icons.Default.TouchApp, "Tasbih", currentScreen == AppScreen.TASBIH) { onScreenSelected(AppScreen.TASBIH) }
         }
     }
 }
 
 @Composable
-private fun DockItem(
+private fun IslandNavItem(
     icon: ImageVector,
     label: String,
     selected: Boolean,
@@ -110,22 +130,38 @@ private fun DockItem(
 ) {
     val tint by animateColorAsState(
         targetValue = if (selected) AmberAccent else TextSecondary,
-        label = "dockTint"
+        label = "navTint"
     )
     val interaction = remember { MutableInteractionSource() }
+
     Column(
         modifier = Modifier
+            .clip(CircleShape)
             .clickable(interactionSource = interaction, indication = null, onClick = onClick)
-            .padding(horizontal = 9.dp, vertical = 5.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 10.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Icon(icon, contentDescription = label, tint = tint, modifier = Modifier.size(21.dp))
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(if (selected) AmberAccent.copy(alpha = 0.18f) else Color.Transparent),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(2.dp))
         Text(
-            label,
+            text = label,
             color = tint,
-            fontSize = 10.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+            fontSize = 10.5.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
         )
     }
 }

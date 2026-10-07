@@ -9,60 +9,29 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BookmarkBorder
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.DeleteOutline
-import androidx.compose.material.icons.filled.LocationCity
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arbdevai.quranvip.data.model.City
 import com.arbdevai.quranvip.data.model.Reciters
-import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
-import com.arbdevai.quranvip.ui.components.CalmIconTile
-import com.arbdevai.quranvip.ui.components.CalmRowItem
-import com.arbdevai.quranvip.ui.components.CalmScreenTitle
-import com.arbdevai.quranvip.ui.components.CalmSection
-import com.arbdevai.quranvip.ui.components.CalmTimeBlock
-import com.arbdevai.quranvip.ui.components.QuietIconButton
-import com.arbdevai.quranvip.ui.theme.AmberAccent
-import com.arbdevai.quranvip.ui.theme.ArabicFontFamily
-import com.arbdevai.quranvip.ui.theme.BgCanvas
-import com.arbdevai.quranvip.ui.theme.BorderSubtle
-import com.arbdevai.quranvip.ui.theme.SurfaceCard
-import com.arbdevai.quranvip.ui.theme.SurfaceInput
-import com.arbdevai.quranvip.ui.theme.TextPrimary
-import com.arbdevai.quranvip.ui.theme.TextSecondary
+import com.arbdevai.quranvip.ui.components.GlassCard
+import com.arbdevai.quranvip.ui.components.QuranHeroBanner
+import com.arbdevai.quranvip.ui.theme.*
 import java.time.LocalDate
 import java.time.format.TextStyle as JavaTextStyle
 import java.util.Locale
@@ -79,124 +48,285 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
     }
 
     Column(
-        modifier.fillMaxSize().background(BgCanvas).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 18.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
     ) {
-        CalmScreenTitle(title = "Jadwal salat", subtitle = state.preferences.city?.lokasi ?: "Atur lokasi dulu")
-        Spacer(modifier = Modifier.height(14.dp))
-
-        CalmSection(title = "Lokasi", actionLabel = if (state.preferences.city == null) null else "Ganti kota", onAction = { cityDialog = true }) {
-            CalmRowItem(
-                leading = { CalmIconTile(Icons.Default.MyLocation, AmberAccent) },
-                title = state.preferences.city?.lokasi ?: "Lokasi belum dipilih",
-                subtitle = if (state.locationError != null) state.locationError else "Koordinat GPS tidak disimpan—hanya dipakai untuk memilih kota.",
-                trailing = {
-                    TextButton(onClick = {
-                        permissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-                    }) { Text("Gunakan GPS") }
-                },
-                showDivider = state.preferences.city != null
-            )
-            if (state.preferences.city == null) {
-                CalmRowItem(
-                    leading = { CalmIconTile(Icons.Default.LocationCity, TextSecondary) },
-                    title = "Pilih kota",
-                    subtitle = "Cari kabupaten atau kota",
-                    trailing = null,
-                    showDivider = false,
-                    onClick = { cityDialog = true }
-                )
+        // 1. Signature Hero Card Jadwal Salat (Yasin style with ۞)
+        val cityLokasi = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS Otomatis"
+        val hijriSummary = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Jadwal Waktu Salat"
+        QuranHeroBanner(
+            title = "Jadwal Salat Digital",
+            subtitle = "$cityLokasi · $hijriSummary",
+            tag = "API MUSLIM V3",
+            arabicWatermark = "۞",
+            badges = listOf(state.preferences.city?.lokasi ?: "Lokasi GPS", state.preferences.zone, "Kemenag RI"),
+            trailingContent = {
+                FilledIconButton(
+                    onClick = { cityDialog = true },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(38.dp)
+                ) {
+                    Icon(Icons.Default.LocationCity, contentDescription = "Pilih Kota")
+                }
+                Spacer(modifier = Modifier.width(6.dp))
+                FilledIconButton(
+                    onClick = {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(38.dp)
+                ) {
+                    Icon(Icons.Default.MyLocation, contentDescription = "GPS Otomatis")
+                }
             }
-            if (state.locationLoading) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = 12.dp)) {
-                    CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Mencari kota terdekat...", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+        )
+
+        if (state.locationLoading) {
+            Spacer(Modifier.height(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                Spacer(Modifier.width(8.dp))
+                Text("Mendeteksi koordinat GPS...", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+            }
+        }
+
+        if (state.locationError != null) {
+            Spacer(Modifier.height(10.dp))
+            GlassCard(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        state.locationError,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFFFF6B6B),
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = viewModel::detectLocation) {
+                        Text("Coba Lagi", color = AmberAccent)
+                    }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(Modifier.height(18.dp))
 
-        CalmSection(title = "Hari ini") {
-            val selected = state.selectedPrayerDay
-            if (state.prayerLoading) {
-                Text("Memuat jadwal salat...", color = TextSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 12.dp))
-            } else if (state.prayerError != null) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 10.dp)) {
-                    Text(state.prayerError, color = TextSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
-                    TextButton(onClick = viewModel::retryPrayer) { Text("Coba lagi") }
-                }
-            } else if (selected != null) {
-                MonthPager(state, viewModel)
-                Spacer(modifier = Modifier.height(10.dp))
-                CalendarGrid(state, viewModel)
-                Spacer(modifier = Modifier.height(12.dp))
-                Text("${state.selectedPrayerDate}", style = MaterialTheme.typography.titleMedium, color = TextPrimary)
-                Spacer(modifier = Modifier.height(3.dp))
+        // Month Selector
+        val indonesianMonths = listOf(
+            "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        )
+        val monthName = indonesianMonths.getOrElse(state.prayerMonth.monthValue - 1) { state.prayerMonth.month.name }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { viewModel.changePrayerMonth(-1) }) {
+                Icon(Icons.Default.ChevronLeft, "Bulan Lalu", tint = TextPrimary)
+            }
+            Text(
+                text = "$monthName ${state.prayerMonth.year}",
+                style = MaterialTheme.typography.titleMedium,
+                color = TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = { viewModel.changePrayerMonth(1) }) {
+                Icon(Icons.Default.ChevronRight, "Bulan Depan", tint = TextPrimary)
+            }
+        }
+
+        // Hijri Conversion Status
+        when {
+            state.calendarLoading -> {
                 Text(
-                    state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} Hijriah" } ?: "Kalender Hijriah dimuat otomatis",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary
+                    "Memuat kalender Hijriah...",
+                    color = TextSecondary,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    selected.times().forEach { (name, time) ->
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(name, style = MaterialTheme.typography.bodyMedium, color = TextSecondary)
-                            Text(time, style = MaterialTheme.typography.titleMedium, color = TextPrimary)
+            }
+            state.calendarError != null -> {
+                Row(
+                    Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(state.calendarError, color = Color(0xFFFF6B6B), style = MaterialTheme.typography.bodySmall)
+                    Spacer(Modifier.width(6.dp))
+                    TextButton(onClick = viewModel::retryCalendar) { Text("Coba Lagi", color = AmberAccent, fontSize = 11.sp) }
+                }
+            }
+            state.selectedCalendar != null -> {
+                Text(
+                    text = "${state.selectedCalendar.hijr.day} ${state.selectedCalendar.hijr.monthName} ${state.selectedCalendar.hijr.year} H",
+                    color = AmberAccent,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        // Calendar Grid
+        CalendarGrid(state, viewModel)
+
+        Spacer(Modifier.height(18.dp))
+
+        // Daily Prayer Details
+        val selectedDay = state.selectedPrayerDay
+        when {
+            state.prayerLoading -> {
+                LoadingView("Memuat jadwal shalat...")
+            }
+            state.prayerError != null -> {
+                ErrorView(state.prayerError, viewModel::retryPrayer)
+            }
+            selectedDay != null -> {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Column(Modifier.padding(18.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Waktu Salat: ${selectedDay.tanggal}",
+                                color = AmberAccent,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(Modifier.height(14.dp))
+                        selectedDay.times().forEach { (name, time) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 6.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(name, color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    time,
+                                    color = TextPrimary,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
                         }
                     }
                 }
-            } else {
-                Text("Pilih kota dulu agar jadwal yang tampil tidak keliru.", color = TextSecondary, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(vertical = 12.dp))
+            }
+            else -> {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = if (state.preferences.city == null)
+                            "Pilih kota lokasi Anda atau aktifkan GPS untuk melihat jadwal shalat"
+                        else "Jadwal untuk tanggal ini belum tersedia",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
             }
         }
     }
 
-    if (cityDialog) CityDialog(state, viewModel) { cityDialog = false }
-}
-
-@Composable
-private fun MonthPager(state: UiState, viewModel: AppViewModel) {
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-        TextButton(onClick = { viewModel.changePrayerMonth(-1) }) { Text("‹ Bulan lalu") }
-        Text(
-            "${state.prayerMonth.month.getDisplayName(JavaTextStyle.FULL, Locale("id"))} ${state.prayerMonth.year}",
-            color = TextPrimary,
-            style = MaterialTheme.typography.titleMedium
-        )
-        TextButton(onClick = { viewModel.changePrayerMonth(1) }) { Text("Bulan depan ›") }
+    if (cityDialog) {
+        CityDialog(state, viewModel) { cityDialog = false }
     }
 }
 
 @Composable
 private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
     val month = state.prayerMonth
-    val lead = (month.atDay(1).dayOfWeek.value % 7)
-    Column {
-        Row(Modifier.fillMaxWidth()) {
-            listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab").forEach {
-                Text(it, color = TextSecondary, textAlign = TextAlign.Center, modifier = Modifier.weight(1f).padding(vertical = 4.dp), fontSize = 12.sp)
-            }
-        }
-        (List(lead) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }).chunked(7).forEach { week ->
+    val first = month.atDay(1)
+    val lead = (first.dayOfWeek.value % 7)
+
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(Modifier.padding(10.dp)) {
             Row(Modifier.fillMaxWidth()) {
-                week.forEach { date ->
-                    val selected = date == state.selectedPrayerDate
-                    val today = date == LocalDate.now()
-                    Box(
-                        Modifier.weight(1f).padding(2.dp)
-                            .background(if (selected) AmberAccent else Color.Transparent, MaterialTheme.shapes.small)
-                            .clickable(enabled = date != null) { date?.let(viewModel::setPrayerDate) }
-                            .padding(vertical = 9.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (date != null) {
-                            Text("${date.dayOfMonth}", color = if (selected) Color(0xFF141518) else TextPrimary, fontWeight = if (selected || today) FontWeight.SemiBold else FontWeight.Normal)
+                listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab").forEach { dayLabel ->
+                    Text(
+                        text = dayLabel,
+                        color = if (dayLabel == "Jum") AmberAccent else TextSecondary,
+                        style = MaterialTheme.typography.labelSmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f).padding(vertical = 4.dp),
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            val cells = List(lead) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }
+            cells.chunked(7).forEach { week ->
+                Row(Modifier.fillMaxWidth()) {
+                    week.forEach { date ->
+                        val isSelected = date == state.selectedPrayerDate
+                        val isToday = date == LocalDate.now()
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(2.dp)
+                                .height(38.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    when {
+                                        isSelected -> AmberAccent
+                                        isToday -> Color.White.copy(alpha = 0.15f)
+                                        else -> Color.Transparent
+                                    }
+                                )
+                                .clickable(enabled = date != null) {
+                                    date?.let(viewModel::setPrayerDate)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (date != null) {
+                                Text(
+                                    text = "${date.dayOfMonth}",
+                                    color = if (isSelected) Color.Black else TextPrimary,
+                                    fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 12.sp
+                                )
+                            }
                         }
                     }
+                    repeat(7 - week.size) {
+                        Spacer(Modifier.weight(1f))
+                    }
                 }
-                repeat(7 - week.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
@@ -206,37 +336,83 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
 private fun CityDialog(state: UiState, viewModel: AppViewModel, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Cari kota", color = TextPrimary) },
+        title = {
+            Text("Pilih Kota / Kabupaten", style = MaterialTheme.typography.titleLarge, color = TextPrimary, fontWeight = FontWeight.Bold)
+        },
         text = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 400.dp)
+            ) {
                 OutlinedTextField(
                     value = state.cityQuery,
                     onValueChange = viewModel::setCityQuery,
+                    placeholder = { Text("Ketik nama kota, misal: Kediri, Jakarta...", fontSize = 13.sp) },
+                    leadingIcon = { Icon(Icons.Default.Search, null, tint = AmberAccent) },
                     singleLine = true,
-                    placeholder = { Text("Contoh: Surabaya") },
-                    leadingIcon = { Icon(Icons.Default.Search, null, tint = TextSecondary) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = SurfaceInput,
+                        unfocusedContainerColor = SurfaceInput,
+                        focusedBorderColor = AmberAccent,
+                        unfocusedBorderColor = BorderSubtle,
+                        focusedTextColor = TextPrimary,
+                        unfocusedTextColor = TextPrimary
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(Modifier.height(8.dp))
+
+                Spacer(Modifier.height(10.dp))
+
                 when {
-                    state.citiesLoading -> Text("Mencari...", color = TextSecondary, modifier = Modifier.padding(12.dp))
-                    state.cityResults.isEmpty() && state.cityQuery.isNotBlank() -> Text("Kota tidak ditemukan. Coba ejaan lain.", color = TextSecondary, modifier = Modifier.padding(12.dp))
-                    else -> LazyColumn(modifier = Modifier.heightIn(max = 340.dp)) {
-                        items(state.cityResults.take(20), key = { it.id }) { city ->
-                            Row(
-                                Modifier.fillMaxWidth().clickable { viewModel.chooseCity(city, state.preferences.zone); onDismiss() }.padding(vertical = 11.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(Icons.Default.Place, null, tint = TextSecondary)
-                                Spacer(Modifier.width(8.dp))
-                                Text(city.lokasi, color = TextPrimary)
+                    state.citiesLoading -> {
+                        Box(Modifier.fillMaxWidth().padding(16.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(24.dp))
+                        }
+                    }
+                    state.cityResults.isEmpty() && state.cityQuery.isNotBlank() -> {
+                        Text(
+                            "Tidak ada kota dengan nama \"${state.cityQuery}\"",
+                            color = TextSecondary,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(12.dp)
+                        )
+                    }
+                    else -> {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.fillMaxWidth().weight(1f, fill = false)
+                        ) {
+                            items(state.cityResults.take(20), key = { it.id }) { city ->
+                                Surface(
+                                    color = Color.Transparent,
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            viewModel.chooseCity(city, state.preferences.zone)
+                                            onDismiss()
+                                        }
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 10.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(Icons.Default.Place, null, tint = AmberAccent, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(8.dp))
+                                        Text(city.lokasi, color = TextPrimary, style = MaterialTheme.typography.bodyMedium)
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Batal") } },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Batal", color = AmberAccent) }
+        },
         containerColor = SurfaceCard
     )
 }
@@ -244,31 +420,67 @@ private fun CityDialog(state: UiState, viewModel: AppViewModel, onDismiss: () ->
 @Composable
 fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
     LazyColumn(
-        modifier.fillMaxSize().background(BgCanvas),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 18.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        item { CalmScreenTitle("Simpanan", "Ayat yang Anda tandai") }
+        // 1. Hero Card Bookmark (Yasin style with ۞)
+        item {
+            QuranHeroBanner(
+                title = "Ayat Favorit",
+                subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
+                tag = "TADARUS PRIBADI",
+                arabicWatermark = "۞",
+                badges = listOf("${state.preferences.bookmarks.size} Disimpan", "Tadarus Harian")
+            )
+        }
+
         if (state.preferences.bookmarks.isEmpty()) {
-            item { Text("Belum ada ayat tersimpan. Sentuh sebuah ayat saat membaca, lalu pilih Simpan.", color = TextSecondary, style = MaterialTheme.typography.bodySmall) }
+            item {
+                EmptyView("Belum ada ayat yang disimpan ke bookmark")
+            }
         } else {
             items(state.preferences.bookmarks, key = { "${it.surah}:${it.ayah}" }) { bookmark ->
-                Surface(color = SurfaceCard, shape = MaterialTheme.shapes.medium, modifier = Modifier.fillMaxWidth()) {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(18.dp),
+                    onClick = { viewModel.openSurah(bookmark.surah, bookmark.ayah) }
+                ) {
                     Column(Modifier.padding(16.dp)) {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("Surah ${bookmark.name} · ayat ${bookmark.ayah}", color = AmberAccent, style = MaterialTheme.typography.titleMedium)
-                            TextButton(onClick = { viewModel.removeOrAddBookmark(bookmark) }) {
-                                Icon(Icons.Default.DeleteOutline, null, modifier = Modifier.size(17.dp))
-                                Spacer(Modifier.width(3.dp))
-                                Text("Hapus")
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Surah ${bookmark.name} · Ayat ${bookmark.ayah}",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = AmberAccent,
+                                fontWeight = FontWeight.Bold
+                            )
+                            IconButton(onClick = { viewModel.removeOrAddBookmark(bookmark) }) {
+                                Icon(Icons.Default.DeleteOutline, "Hapus", tint = TextSecondary)
                             }
                         }
-                        Text(bookmark.arabic, fontFamily = ArabicFontFamily, fontSize = 21.sp, lineHeight = 40.sp, color = TextPrimary, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
-                        Spacer(Modifier.height(6.dp))
-                        Text(bookmark.translation, color = TextSecondary, style = MaterialTheme.typography.bodySmall, maxLines = 3)
-                        TextButton(onClick = { viewModel.openSurah(bookmark.surah, bookmark.ayah) }, modifier = Modifier.align(Alignment.Start)) {
-                            Text("Buka di mushaf")
-                        }
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            bookmark.arabic,
+                            fontFamily = ArabicFontFamily,
+                            fontSize = 22.sp,
+                            lineHeight = 40.sp,
+                            color = TextPrimary,
+                            textAlign = TextAlign.End,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            bookmark.translation,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextTranslation,
+                            maxLines = 3
+                        )
                     }
                 }
             }
@@ -278,118 +490,231 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
 
 @Composable
 fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
-    val presets = listOf("Subhanallah", "Alhamdulillah", "Allahu Akbar", "Astaghfirullah")
-    var selected by rememberSaveable { mutableStateOf(presets.first()) }
+    val zikirPresets = listOf(
+        "Subhanallah",
+        "Alhamdulillah",
+        "Allahu Akbar",
+        "Astaghfirullah",
+        "La ilaha illallah"
+    )
+    var selectedZikir by rememberSaveable { mutableStateOf(zikirPresets.first()) }
+
     Column(
-        modifier.fillMaxSize().background(BgCanvas).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 18.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CalmScreenTitle("Tasbih", selected, modifier = Modifier.fillMaxWidth())
-        Spacer(Modifier.height(14.dp))
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            presets.take(3).forEach {
+        // 1. Hero Card Tasbih (Yasin style with ۞)
+        QuranHeroBanner(
+            title = "Tasbih Digital VIP",
+            subtitle = selectedZikir,
+            tag = "ZIKIR HARIAN",
+            arabicWatermark = "۞",
+            badges = listOf("Haptic Touch", "Target 33x / 99x", "Hitungan: ${state.preferences.tasbih}")
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        // Preset Chips
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            zikirPresets.take(3).forEach { zikir ->
+                val isSelected = selectedZikir == zikir
                 FilterChip(
-                    selected = selected == it,
-                    onClick = { selected = it },
-                    label = { Text(it, fontSize = 12.sp) },
+                    selected = isSelected,
+                    onClick = { selectedZikir = zikir },
+                    label = { Text(zikir, fontSize = 11.5.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = AmberAccent,
+                        selectedLabelColor = Color.Black
+                    ),
                     modifier = Modifier.weight(1f)
                 )
             }
         }
-        Spacer(Modifier.height(34.dp))
-        Surface(shape = MaterialTheme.shapes.extraLarge, color = SurfaceCard, modifier = Modifier.size(220.dp).clickable { viewModel.incrementTasbih() }) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
-                Text("${state.preferences.tasbih}", fontSize = 58.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
-                Text("Sentuh lingkaran untuk menghitung", color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+
+        Spacer(Modifier.height(36.dp))
+
+        // Glowing Big Tactile Ring Button (Directly inspired by Yasin Tasbih Zen button)
+        GlassCard(
+            shape = CircleShape,
+            containerColor = SurfaceCard,
+            borderColor = AmberAccent.copy(alpha = 0.50f),
+            borderWidth = 2.dp,
+            modifier = Modifier
+                .size(240.dp)
+                .clickable { viewModel.incrementTasbih() }
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(54.dp)
+                        .clip(CircleShape)
+                        .background(CatTasbih.copy(alpha = 0.20f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.TouchApp,
+                        contentDescription = null,
+                        tint = CatTasbih,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                Spacer(Modifier.height(14.dp))
+                Text(
+                    text = "${state.preferences.tasbih}",
+                    fontSize = 58.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AmberAccent
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = "Ketuk untuk berdzikir",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary
+                )
             }
         }
-        Spacer(Modifier.height(22.dp))
-        OutlinedButton(onClick = viewModel::resetTasbih) {
-            Icon(Icons.Default.Refresh, null, tint = AmberAccent)
+
+        Spacer(Modifier.height(28.dp))
+
+        OutlinedButton(
+            onClick = viewModel::resetTasbih,
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Icon(Icons.Default.Refresh, contentDescription = null, tint = AmberAccent)
             Spacer(Modifier.width(6.dp))
-            Text("Mulai dari nol")
+            Text("Reset Hitungan", color = AmberAccent)
         }
     }
 }
 
 @Composable
 fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
-    Column(
-        modifier.fillMaxSize().background(BgCanvas).verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 18.dp)
-    ) {
-        CalmScreenTitle("Pengaturan", "Disesuaikan dengan kebiasaan membaca")
-        Spacer(Modifier.height(14.dp))
+    var zone by rememberSaveable(state.preferences.zone) { mutableStateOf(state.preferences.zone) }
 
-        CalmSection(title = "Tampilan ayat") {
-            SettingSwitch("Tampilkan transliterasi", state.preferences.showLatin, viewModel::toggleLatin)
-            SettingSwitch("Tampilkan terjemahan", state.preferences.showTranslation, viewModel::toggleTranslation, showDivider = false)
-        }
-        Spacer(Modifier.height(14.dp))
-        CalmSection(title = "Ukuran huruf Arab: ${state.preferences.fontSize}") {
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                Text("Ukuran", color = TextSecondary, modifier = Modifier.weight(1f))
-                TextButton(onClick = { viewModel.setFontSize(state.preferences.fontSize - 1) }) { Text("Kecilkan") }
-                TextButton(onClick = { viewModel.setFontSize(state.preferences.fontSize + 1) }) { Text("Besarkan") }
-            }
-        }
-        Spacer(Modifier.height(14.dp))
-        CalmSection(title = "Qari") {
-            var expanded by rememberSaveable { mutableStateOf(false) }
-            CalmRowItem(
-                title = Reciters.names[state.preferences.qori] ?: "Pilih qari",
-                subtitle = "Suara untuk audio ayat",
-                trailing = { TextButton(onClick = { expanded = true }) { Text("Ganti") } },
-                showDivider = false
-            )
-            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                Reciters.names.forEach { (id, name) ->
-                    DropdownMenuItem(text = { Text(name) }, onClick = { viewModel.setQori(id); expanded = false })
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
+    ) {
+        // 1. Hero Card Settings
+        val qoriName = Reciters.names[state.preferences.qori] ?: "Qari Pilihan"
+        QuranHeroBanner(
+            title = "Pengaturan VIP",
+            subtitle = "Preferensi Bacaan, Qari, & Waktu Salat",
+            tag = "PREFERENSI APLIKASI",
+            arabicWatermark = "۞",
+            badges = listOf(qoriName, "${state.preferences.fontSize} sp", state.preferences.zone)
+        )
+
+        Spacer(Modifier.height(18.dp))
+
+        Text("Tampilan Bacaan", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AmberAccent)
+        Spacer(Modifier.height(8.dp))
+        SettingSwitch("Tampilkan Latin", state.preferences.showLatin, viewModel::toggleLatin)
+        SettingSwitch("Tampilkan Terjemahan", state.preferences.showTranslation, viewModel::toggleTranslation)
+
+        GlassCard(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth().padding(14.dp)
+            ) {
+                Text(
+                    "Ukuran Huruf Arab: ${state.preferences.fontSize} sp",
+                    color = TextPrimary,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = { viewModel.setFontSize(state.preferences.fontSize - 1) }) {
+                    Text("A−", color = AmberAccent, fontWeight = FontWeight.Bold)
+                }
+                IconButton(onClick = { viewModel.setFontSize(state.preferences.fontSize + 1) }) {
+                    Text("A+", color = AmberAccent, fontWeight = FontWeight.Bold)
                 }
             }
         }
-        Spacer(Modifier.height(14.dp))
-        CalmSection(title = "Wilayah waktu salat") {
-            val zones = listOf(
-                "Asia/Jakarta" to "WIB (Sumatera, Jawa, Kalimantan Barat/Tengah)",
-                "Asia/Makassar" to "WITA (Bali, Kalimantan Timur/Selatan, Sulawesi)",
-                "Asia/Jayapura" to "WIT (Maluku, Papua)"
-            )
-            zones.forEach { (id, label) ->
-                CalmRowItem(
-                    title = label,
-                    subtitle = id,
-                    trailing = { if (state.preferences.zone == id) Icon(Icons.Default.Check, null, tint = AmberAccent) },
-                    showDivider = id != zones.last().first,
-                    onClick = { viewModel.setZone(id) }
-                )
+
+        Spacer(Modifier.height(20.dp))
+        Text("Qari Pilihan", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AmberAccent)
+        Spacer(Modifier.height(8.dp))
+        var expanded by rememberSaveable { mutableStateOf(false) }
+        Box {
+            OutlinedButton(
+                onClick = { expanded = true },
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(Reciters.names[state.preferences.qori] ?: "Pilih Qari", color = TextPrimary)
+                Spacer(Modifier.width(6.dp))
+                Icon(Icons.Default.ArrowDropDown, null, tint = TextSecondary)
             }
+            DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                Reciters.names.forEach { (id, name) ->
+                    DropdownMenuItem(
+                        text = { Text(name) },
+                        onClick = {
+                            viewModel.setQori(id)
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+        Text("Zona Waktu Jadwal Shalat", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AmberAccent)
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = zone,
+            onValueChange = { zone = it },
+            singleLine = true,
+            label = { Text("Zona Waktu IANA (misal: Asia/Jakarta, Asia/Makassar)") },
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Spacer(Modifier.height(10.dp))
+        Button(
+            onClick = { viewModel.setZone(zone) },
+            shape = RoundedCornerShape(16.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = Color.Black)
+        ) {
+            Text("Simpan Zona Waktu")
         }
     }
 }
 
 @Composable
-private fun SettingSwitch(label: String, checked: Boolean, onClick: () -> Unit, showDivider: Boolean = true) {
-    Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, color = TextPrimary, modifier = Modifier.weight(1f))
-        Switch(
-            checked = checked,
-            onCheckedChange = { onClick() },
-            colors = SwitchDefaults.colors(checkedThumbColor = AmberAccent, checkedTrackColor = SurfaceInput)
-        )
-    }
-    if (showDivider) androidx.compose.material3.HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
-}
-
-@Composable
-private fun FilterChip(selected: Boolean, onClick: () -> Unit, label: @Composable () -> Unit, modifier: Modifier = Modifier) {
-    Surface(
-        color = if (selected) AmberAccent else SurfaceInput,
-        shape = MaterialTheme.shapes.small,
-        modifier = modifier.clickable(onClick = onClick)
+private fun SettingSwitch(label: String, checked: Boolean, onClick: () -> Unit) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Box(Modifier.padding(horizontal = 8.dp, vertical = 8.dp), contentAlignment = Alignment.Center) {
-            val contentColor = if (selected) Color(0xFF141518) else TextPrimary
-            androidx.compose.runtime.CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides contentColor, content = label)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(label, color = TextPrimary, modifier = Modifier.weight(1f))
+            Switch(
+                checked = checked,
+                onCheckedChange = { onClick() },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = AmberAccent,
+                    checkedTrackColor = SurfacePill
+                )
+            )
         }
     }
 }
