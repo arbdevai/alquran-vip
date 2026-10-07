@@ -1,13 +1,19 @@
 package com.arbdevai.quranvip.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.ui.theme.AmberAccent
+import com.arbdevai.quranvip.ui.theme.BorderSubtle
 import com.arbdevai.quranvip.ui.theme.EmeraldGradientEnd
 import com.arbdevai.quranvip.ui.theme.EmeraldGradientStart
 import com.arbdevai.quranvip.ui.theme.Spacing
@@ -36,25 +43,9 @@ fun QuranHeroBanner(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.large)
-            .background(
-                Brush.linearGradient(
-                    colors = gradientColors
-                )
-            )
-            .border(
-                BorderStroke(
-                    1.dp,
-                    Brush.linearGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.38f),
-                            Color.White.copy(alpha = 0.08f),
-                            AmberAccent.copy(alpha = 0.35f)
-                        )
-                    )
-                ),
-                MaterialTheme.shapes.large
-            )
+            .clip(RoundedCornerShape(22.dp))
+            .background(Brush.linearGradient(gradientColors))
+            .border(0.5.dp, BorderSubtle, RoundedCornerShape(22.dp))
             .padding(Spacing.cardPadding)
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -64,57 +55,34 @@ fun QuranHeroBanner(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f, fill = false)) {
-                    // 1. Eyebrow Tag / Kicker
                     if (tag != null) {
-                        Surface(
-                            color = Color.Black.copy(alpha = 0.3f),
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .border(
-                                    BorderStroke(0.5.dp, Color.White.copy(alpha = 0.15f)),
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .padding(bottom = 8.dp)
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "✦",
-                                    color = AmberAccent,
-                                    fontSize = 9.sp,
-                                    modifier = Modifier.padding(end = 4.dp)
-                                )
-                                Text(
-                                    text = tag.uppercase(),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = Color.White.copy(alpha = 0.95f)
-                                )
-                            }
-                        }
+                        Text(
+                            text = tag.uppercase(),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            letterSpacing = 1.sp,
+                            color = AmberAccent
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
 
-                    // 2. Grand Display Title
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFFF4F1EA)
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(3.dp))
 
-                    // 3. Informative Subtitle
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color.White.copy(alpha = 0.88f),
+                        color = Color(0xFFD1D4DA),
                         lineHeight = 18.sp
                     )
                 }
 
-                // 4. Interactive Trailing Action
                 if (trailingContent != null) {
                     Spacer(modifier = Modifier.width(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -123,7 +91,6 @@ fun QuranHeroBanner(
                 }
             }
 
-            // 5. Stat Pills / Badges (Optional bottom chips)
             if (badges.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
@@ -131,21 +98,17 @@ fun QuranHeroBanner(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     badges.forEach { badgeText ->
-                        Surface(
-                            shape = RoundedCornerShape(10.dp),
-                            color = Color.Black.copy(alpha = 0.22f),
-                            modifier = Modifier.border(
-                                BorderStroke(0.5.dp, Color.White.copy(alpha = 0.12f)),
-                                RoundedCornerShape(10.dp)
-                            )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.Black.copy(alpha = 0.28f))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
                             Text(
                                 text = badgeText,
                                 style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.95f),
-                                fontWeight = FontWeight.Medium,
-                                fontSize = 11.sp,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                                color = Color(0xFFF4F1EA),
+                                fontSize = 11.sp
                             )
                         }
                     }

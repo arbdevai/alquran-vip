@@ -28,7 +28,15 @@ val ArabicLineHeightStyle = LineHeightStyle(
 )
 
 val QuranTypography = Typography(
-    // 1. Teks Arab Utama Ayat Al-Qur'an (Scalable)
+    displayLarge = TextStyle(
+        fontFamily = ArabicFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 34.sp,
+        lineHeight = 68.sp,
+        textDirection = TextDirection.Rtl,
+        lineHeightStyle = ArabicLineHeightStyle,
+        color = TextPrimary
+    ),
     displayMedium = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Normal,
@@ -38,41 +46,60 @@ val QuranTypography = Typography(
         lineHeightStyle = ArabicLineHeightStyle,
         color = TextPrimary
     ),
-    // 2. Tulisan Kaligrafi Nama Surah Arab
+    displaySmall = TextStyle(
+        fontFamily = ArabicFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 24.sp,
+        lineHeight = 46.sp,
+        textDirection = TextDirection.Rtl,
+        lineHeightStyle = ArabicLineHeightStyle,
+        color = TextPrimary
+    ),
     headlineMedium = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
         lineHeight = 36.sp,
         textDirection = TextDirection.Rtl,
+        lineHeightStyle = ArabicLineHeightStyle,
         color = AmberAccent
     ),
-    // 3. Judul Hero Card
     titleLarge = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 20.sp,
-        lineHeight = 26.sp,
-        letterSpacing = 0.15.sp,
+        fontSize = 22.sp,
+        lineHeight = 29.sp,
+        letterSpacing = 0.05.sp,
         color = TextPrimary
     ),
-    // 4. Nama Surah Latin & Subheader
     titleMedium = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.SemiBold,
-        fontSize = 15.sp,
+        fontSize = 16.sp,
+        lineHeight = 23.sp,
+        color = TextPrimary
+    ),
+    titleSmall = TextStyle(
+        fontFamily = LatinFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
         lineHeight = 20.sp,
         color = TextPrimary
     ),
-    // 5. Transliterasi Latin Fonetik
+    bodyLarge = TextStyle(
+        fontFamily = LatinFontFamily,
+        fontWeight = FontWeight.Normal,
+        fontSize = 16.sp,
+        lineHeight = 26.sp,
+        color = TextTranslation
+    ),
     bodyMedium = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 13.5.sp,
-        lineHeight = 20.sp,
+        fontSize = 14.sp,
+        lineHeight = 22.sp,
         color = TextTransliteration
     ),
-    // 6. Terjemahan Bahasa Indonesia
     bodySmall = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Normal,
@@ -80,20 +107,25 @@ val QuranTypography = Typography(
         lineHeight = 22.sp,
         color = TextTranslation
     ),
-    // 7. Eyebrow Tag / Kicker
+    labelLarge = TextStyle(
+        fontFamily = LatinFontFamily,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        color = TextPrimary
+    ),
     labelMedium = TextStyle(
         fontFamily = LatinFontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.5.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 1.2.sp,
-        color = androidx.compose.ui.graphics.Color.White
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.1.sp,
+        color = TextSecondary
     ),
-    // 8. Label Sub-info & Metadata
     labelSmall = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 11.5.sp,
+        fontSize = 12.sp,
         lineHeight = 16.sp,
         color = TextSecondary
     )

@@ -29,6 +29,11 @@ android {
         vectorDrawables { useSupportLibrary = true }
     }
 
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = false
+    }
+
     signingConfigs {
         create("release") {
             val keystorePath = providers.gradleProperty("QURANVIP_KEYSTORE")

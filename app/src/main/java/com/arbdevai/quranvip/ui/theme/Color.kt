@@ -2,50 +2,40 @@ package com.arbdevai.quranvip.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ==========================================
-// 1. Background & Surface (AMOLED Pure Dark)
-// ==========================================
-val BgCanvas = Color(0xFF000000)             // Root background layar
-val SurfaceCard = Color(0xFF16181B)          // Kartu ayat, item surah, container pengaturan
-val SurfaceInput = Color(0xFF22252A)         // Dropdown, search bar, secondary pill
-val SurfacePill = Color(0xFF2A2E35)          // Nomor ayat badge, tafsir chip
-val BorderSubtle = Color(0xFF2E3238)         // Garis pemisah halus
+// A warm, restrained night palette. Black is reserved for the canvas; contrast is created
+// with quiet tonal layers rather than bright borders or repeated gradients.
+val BgCanvas = Color(0xFF0B0C0E)
+val SurfaceCard = Color(0xFF141518)
+val SurfaceRaised = Color(0xFF1A1C20)
+val SurfaceInput = Color(0xFF1C1E22)
+val SurfacePill = Color(0xFF25272C)
+val BorderSubtle = Color(0xFF2A2C31)
 
-// ==========================================
-// 2. Brand & Accent
-// ==========================================
-val AmberAccent = Color(0xFFFF9E00)          // CTA aktif, audio button, nomor surah, active tab
-val AmberPressed = Color(0xFFE68E00)         // State tombol ditekan
-val EmeraldGradientStart = Color(0xFF0A7558) // Banner atas & header surah
-val EmeraldGradientEnd = Color(0xFF139E77)   // Banner gradien kanan-bawah
+// One accent, used intentionally: navigation selection, primary action, and current state.
+val AmberAccent = Color(0xFFE5C378)
+val AmberPressed = Color(0xFFCDAA5F)
+val EmeraldGradientStart = Color(0xFF225F4C)
+val EmeraldGradientEnd = Color(0xFF183D35)
 
-// ==========================================
-// 3. Tipografi & Konten Teks
-// ==========================================
-val TextPrimary = Color(0xFFFFFFFF)          // Teks ayat Arab & judul tebal
-val TextTranslation = Color(0xFFC8CCD4)      // Terjemahan Indonesia dengan daya baca tinggi
-val TextSecondary = Color(0xFF9AA0A6)        // Metadata & sub-info halus
-val TextTransliteration = Color(0xFFE8C988)  // Emas pasir lembut untuk transliterasi fonetik
-val TextPlaceholder = Color(0xFF636B78)      // Teks placeholder search
+val TextPrimary = Color(0xFFF4F1EA)
+val TextTranslation = Color(0xFFD1D4DA)
+val TextSecondary = Color(0xFF9CA1AA)
+val TextTransliteration = Color(0xFFDCC99A)
+val TextPlaceholder = Color(0xFF70757E)
 
-// ==========================================
-// 4. Kategori Menu Beranda (Grid Icons)
-// ==========================================
-val CatQuran = Color(0xFF3B82F6)             // Biru
-val CatJadwal = Color(0xFF10B981)            // Emerald mint
-val CatTasbih = Color(0xFFF97316)            // Oranye terang
-val CatTahlil = Color(0xFFEC4899)            // Magenta pink
-val CatDoa = Color(0xFF14B8A6)               // Teal
-val CatHadroh = Color(0xFF6366F1)            // Indigo / Ungu
+val CatQuran = Color(0xFF88AEEA)
+val CatJadwal = Color(0xFF75BDA2)
+val CatTasbih = Color(0xFFE2A365)
+val CatTahlil = Color(0xFFD89DB6)
+val CatDoa = Color(0xFF72BDB5)
+val CatHadroh = Color(0xFF9EA9E6)
 
-// ==========================================
-// 5. Modern Glassmorphism 2026 Tokens
-// ==========================================
-val GlassBackground = Color(0xB8121418)       // Frosted dark background
-val GlassSurface = Color(0xCC16191F)          // Translucent card surface
-val GlassNavbar = Color(0xF2121419)           // Translucent floating navbar
-val GlassBorder = Color(0x2EFFFFFF)           // Specular highlight border
-val GlassBorderGlow = Color(0x40FF9E00)       // Amber accent glow border
-val GlassHighlight = Color(0x14FFFFFF)        // Top rim lighting
-val GlassCardPressed = Color(0xDE1F232B)      // Active glass state
-
+// Legacy names retained for component compatibility. They now express a quiet tonal layer,
+// not high-gloss glass decoration.
+val GlassBackground = Color(0xE00B0C0E)
+val GlassSurface = SurfaceCard
+val GlassNavbar = Color(0xF0141518)
+val GlassBorder = BorderSubtle
+val GlassBorderGlow = AmberAccent.copy(alpha = 0.32f)
+val GlassHighlight = Color.White.copy(alpha = 0.04f)
+val GlassCardPressed = Color(0xFF222016)

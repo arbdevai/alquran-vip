@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.Color
 
 private val QuranColorScheme = darkColorScheme(
     primary = AmberAccent,
-    onPrimary = Color.Black,
+    onPrimary = Color(0xFF141518),
     primaryContainer = SurfacePill,
     onPrimaryContainer = TextPrimary,
     secondary = EmeraldGradientStart,
@@ -19,7 +19,7 @@ private val QuranColorScheme = darkColorScheme(
     surfaceVariant = SurfaceInput,
     onSurfaceVariant = TextSecondary,
     outline = BorderSubtle,
-    error = Color(0xFFFF6B6B)
+    error = Color(0xFFE57373)
 )
 
 @Composable
