@@ -10,16 +10,18 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.R
 
+// Quranic Arabic Font: Scheherazade New (Ottoman Naskh Style with perfect harakat kerning)
 val ArabicFontFamily = FontFamily(
-    Font(R.font.amiri_regular, FontWeight.Normal),
-    Font(R.font.amiri_bold, FontWeight.Bold)
+    Font(R.font.scheherazade_regular, FontWeight.Normal),
+    Font(R.font.scheherazade_bold, FontWeight.Bold)
 )
 
+// Clean International UI Font: Inter
 val LatinFontFamily = FontFamily(
-    Font(R.font.jakarta_sans, FontWeight.Normal),
-    Font(R.font.jakarta_sans, FontWeight.Medium),
-    Font(R.font.jakarta_sans, FontWeight.SemiBold),
-    Font(R.font.jakarta_sans, FontWeight.Bold)
+    Font(R.font.inter, FontWeight.Normal),
+    Font(R.font.inter, FontWeight.Medium),
+    Font(R.font.inter, FontWeight.SemiBold),
+    Font(R.font.inter, FontWeight.Bold)
 )
 
 val ArabicLineHeightStyle = LineHeightStyle(
@@ -31,8 +33,8 @@ val QuranTypography = Typography(
     displayLarge = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 34.sp,
-        lineHeight = 68.sp,
+        fontSize = 36.sp,
+        lineHeight = 72.sp,
         textDirection = TextDirection.Rtl,
         lineHeightStyle = ArabicLineHeightStyle,
         color = TextPrimary
@@ -40,8 +42,8 @@ val QuranTypography = Typography(
     displayMedium = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 28.sp,
-        lineHeight = 56.sp,
+        fontSize = 30.sp,
+        lineHeight = 60.sp,
         textDirection = TextDirection.Rtl,
         lineHeightStyle = ArabicLineHeightStyle,
         color = TextPrimary
@@ -49,8 +51,8 @@ val QuranTypography = Typography(
     displaySmall = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 24.sp,
-        lineHeight = 46.sp,
+        fontSize = 25.sp,
+        lineHeight = 50.sp,
         textDirection = TextDirection.Rtl,
         lineHeightStyle = ArabicLineHeightStyle,
         color = TextPrimary
@@ -58,8 +60,8 @@ val QuranTypography = Typography(
     headlineMedium = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Bold,
-        fontSize = 22.sp,
-        lineHeight = 36.sp,
+        fontSize = 24.sp,
+        lineHeight = 42.sp,
         textDirection = TextDirection.Rtl,
         lineHeightStyle = ArabicLineHeightStyle,
         color = AmberAccent
@@ -68,15 +70,15 @@ val QuranTypography = Typography(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
-        lineHeight = 29.sp,
-        letterSpacing = 0.05.sp,
+        lineHeight = 30.sp,
+        letterSpacing = 0.1.sp,
         color = TextPrimary
     ),
     titleMedium = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.SemiBold,
         fontSize = 16.sp,
-        lineHeight = 23.sp,
+        lineHeight = 24.sp,
         color = TextPrimary
     ),
     titleSmall = TextStyle(
@@ -89,7 +91,7 @@ val QuranTypography = Typography(
     bodyLarge = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
+        fontSize = 15.sp,
         lineHeight = 26.sp,
         color = TextTranslation
     ),
@@ -103,7 +105,7 @@ val QuranTypography = Typography(
     bodySmall = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
+        fontSize = 13.5.sp,
         lineHeight = 22.sp,
         color = TextTranslation
     ),
@@ -116,16 +118,16 @@ val QuranTypography = Typography(
     ),
     labelMedium = TextStyle(
         fontFamily = LatinFontFamily,
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        lineHeight = 18.sp,
-        letterSpacing = 0.1.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 11.5.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.8.sp,
         color = TextSecondary
     ),
     labelSmall = TextStyle(
         fontFamily = LatinFontFamily,
         fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
+        fontSize = 11.sp,
         lineHeight = 16.sp,
         color = TextSecondary
     )
