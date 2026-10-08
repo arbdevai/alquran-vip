@@ -103,7 +103,7 @@ fun QuranAyahCard(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            // 1. Teks Arab Al-Qur'an (RTL, LineHeightStyle centered so diacritics never clip)
+            // 1. Teks Arab Al-Qur'an (RTL - Mulai dari Sebelah Kanan)
             Text(
                 text = ayah.teksArab,
                 color = TextPrimary,
@@ -120,28 +120,33 @@ fun QuranAyahCard(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // 2. Transliterasi Latin Fonetik (Golden Sand, Italic, Relaxed Line Height)
+            // 2. Transliterasi Latin Fonetik (LTR - Mulai dari Sebelah Kiri, Emas Hangat)
             if (showLatin) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = ayah.teksLatin,
+                    textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.bodyMedium.copy(
-                        fontStyle = FontStyle.Italic
+                        fontStyle = FontStyle.Italic,
+                        textDirection = TextDirection.Ltr,
+                        lineHeight = 22.sp
                     ),
                     color = TextTransliteration,
-                    lineHeight = 20.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            // 3. Terjemahan Bahasa Indonesia (High-legibility neutral gray, 22sp line height)
+            // 3. Terjemahan Bahasa Indonesia (LTR - Mulai dari Sebelah Kiri, Abu-abu Terang Bersih)
             if (showTranslation) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = ayah.teksIndonesia,
-                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        textDirection = TextDirection.Ltr,
+                        lineHeight = 24.sp
+                    ),
                     color = TextTranslation,
-                    lineHeight = 22.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

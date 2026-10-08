@@ -110,19 +110,34 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                     )
                 }
 
-                // Row 2: Tasbih Digital & Ayat Favorit
+                // Row 2: Kalender Hijriyah & Tasbih Digital
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     FeatureTile(
+                        title = "Kalender",
+                        subtitle = "Penanggalan Hijriyah",
+                        icon = Icons.Default.CalendarMonth,
+                        gradient = listOf(TileQuranStart, TileJadwalEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.CALENDAR) }
+                    )
+                    FeatureTile(
                         title = "Tasbih Digital",
-                        subtitle = "Penghitung Zikir Harian",
+                        subtitle = "Penghitung Zikir",
                         icon = Icons.Default.TouchApp,
                         gradient = listOf(TileTasbihStart, TileTasbihEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.TASBIH) }
                     )
+                }
+
+                // Row 3: Ayat Disimpan & Pengaturan
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     FeatureTile(
                         title = "Ayat Disimpan",
                         subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
@@ -130,6 +145,14 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         gradient = listOf(TileBookmarkStart, TileBookmarkEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.BOOKMARKS) }
+                    )
+                    FeatureTile(
+                        title = "Pengaturan",
+                        subtitle = "Qari & Huruf Arab",
+                        icon = Icons.Default.Tune,
+                        gradient = listOf(TileSettingsStart, TileSettingsEnd),
+                        modifier = Modifier.weight(1f),
+                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) }
                     )
                 }
             }

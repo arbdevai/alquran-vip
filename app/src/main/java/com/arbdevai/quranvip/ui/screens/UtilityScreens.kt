@@ -21,12 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.data.model.City
 import com.arbdevai.quranvip.data.model.Reciters
+import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.GlassCard
@@ -54,11 +58,11 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .verticalScroll(rememberScrollState())
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
     ) {
-        // 1. Signature Hero Card Jadwal Salat (Yasin style with ۞)
+        // 1. Signature Hero Card Jadwal Salat
         val cityLokasi = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS Otomatis"
         val hijriSummary = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Jadwal Waktu Salat"
         QuranHeroBanner(
-            title = "Jadwal Salat Digital",
+            title = "Jadwal Salat Harian",
             subtitle = "$cityLokasi · $hijriSummary",
             tag = "API MUSLIM V3",
             arabicWatermark = "۞",
@@ -124,9 +128,167 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             }
         }
 
+        Spacer(Modifier.height(16.dp))
+
+        // Tombol Pintas ke Kalender Hijriyah Terpisah
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(18.dp),
+            onClick = { viewModel.setScreen(AppScreen.CALENDAR) }
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(CatQuran.copy(alpha = 0.20f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = null,
+                            tint = CatQuran,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
+                        Text(
+                            text = "Buka Kalender Hijriyah",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = TextPrimary
+                        )
+                        Text(
+                            text = "Konversi penanggalan & jadwal bulanan",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = TextSecondary
+                        )
+                    }
+                }
+                Icon(
+                    imageVector = Icons.Default.ArrowForward,
+                    contentDescription = null,
+                    tint = AmberAccent,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Today's Detailed Prayer Times
+        val day = state.todayPrayerDay ?: state.selectedPrayerDay
+        when {
+            state.prayerLoading -> {
+                LoadingView("Memuat jadwal salat...")
+            }
+            state.prayerError != null -> {
+                ErrorView(state.prayerError, viewModel::retryPrayer)
+            }
+            day != null -> {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(22.dp)
+                ) {
+                    Column(Modifier.padding(18.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Waktu Salat Hari Ini",
+                                color = AmberAccent,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                day.tanggal,
+                                color = TextSecondary,
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                        Spacer(Modifier.height(14.dp))
+                        day.times().forEach { (name, time) ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    name,
+                                    color = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) TextPrimary else TextSecondary,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) FontWeight.Bold else FontWeight.Normal
+                                )
+                                Text(
+                                    time,
+                                    color = AmberAccent,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
+            else -> {
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = if (state.preferences.city == null)
+                            "Pilih kota lokasi Anda atau aktifkan GPS untuk melihat jadwal salat akurat"
+                        else "Jadwal salat belum tersedia",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(20.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    if (cityDialog) {
+        CityDialog(state, viewModel) { cityDialog = false }
+    }
+}
+
+@Composable
+fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(BgCanvas)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
+    ) {
+        // Hero Card Kalender Hijriyah & Masehi
+        val hijriText = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Kalender Hijriyah"
+        QuranHeroBanner(
+            title = "Kalender Hijriyah & Masehi",
+            subtitle = hijriText,
+            tag = "PENANGGALAN ISLAM",
+            arabicWatermark = "۞",
+            badges = listOf(state.selectedCalendar?.ce?.today ?: "Masehi", state.preferences.zone)
+        )
+
         Spacer(Modifier.height(18.dp))
 
-        // Month Selector
+        // Month Selector (Bulan Lalu / Bulan Depan)
         val indonesianMonths = listOf(
             "Januari", "Februari", "Maret", "April", "Mei", "Juni",
             "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -187,81 +349,42 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
 
         Spacer(Modifier.height(8.dp))
 
-        // Calendar Grid
+        // Interactive Calendar Grid
         CalendarGrid(state, viewModel)
 
         Spacer(Modifier.height(18.dp))
 
-        // Daily Prayer Details
+        // Prayer Schedule for Selected Calendar Date
         val selectedDay = state.selectedPrayerDay
-        when {
-            state.prayerLoading -> {
-                LoadingView("Memuat jadwal shalat...")
-            }
-            state.prayerError != null -> {
-                ErrorView(state.prayerError, viewModel::retryPrayer)
-            }
-            selectedDay != null -> {
-                GlassCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Column(Modifier.padding(18.dp)) {
+        if (selectedDay != null) {
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Column(Modifier.padding(18.dp)) {
+                    Text(
+                        "Jadwal Salat: ${selectedDay.tanggal}",
+                        color = AmberAccent,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    selectedDay.times().forEach { (name, time) ->
                         Row(
-                            Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                "Waktu Salat: ${selectedDay.tanggal}",
-                                color = AmberAccent,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
-                            )
+                            Text(name, color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                            Text(time, color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         }
-                        Spacer(Modifier.height(14.dp))
-                        selectedDay.times().forEach { (name, time) ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(name, color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
-                                Text(
-                                    time,
-                                    color = TextPrimary,
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
-                        }
+                        HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
                     }
                 }
             }
-            else -> {
-                GlassCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp)
-                ) {
-                    Text(
-                        text = if (state.preferences.city == null)
-                            "Pilih kota lokasi Anda atau aktifkan GPS untuk melihat jadwal shalat"
-                        else "Jadwal untuk tanggal ini belum tersedia",
-                        color = TextSecondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(20.dp)
-                    )
-                }
-            }
         }
-    }
-
-    if (cityDialog) {
-        CityDialog(state, viewModel) { cityDialog = false }
     }
 }
 
@@ -466,18 +589,28 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
                         }
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            bookmark.arabic,
-                            fontFamily = ArabicFontFamily,
-                            fontSize = 22.sp,
-                            lineHeight = 40.sp,
+                            text = bookmark.arabic,
                             color = TextPrimary,
                             textAlign = TextAlign.End,
+                            style = TextStyle(
+                                fontFamily = ArabicFontFamily,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 22.sp,
+                                lineHeight = 42.sp,
+                                lineHeightStyle = ArabicLineHeightStyle,
+                                textDirection = TextDirection.Rtl,
+                                platformStyle = PlatformTextStyle(includeFontPadding = false)
+                            ),
                             modifier = Modifier.fillMaxWidth()
                         )
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            bookmark.translation,
-                            style = MaterialTheme.typography.bodySmall,
+                            text = bookmark.translation,
+                            textAlign = TextAlign.Start,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                textDirection = TextDirection.Ltr,
+                                lineHeight = 22.sp
+                            ),
                             color = TextTranslation,
                             maxLines = 3
                         )
@@ -540,7 +673,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
 
         Spacer(Modifier.height(36.dp))
 
-        // Glowing Big Tactile Ring Button (Directly inspired by Yasin Tasbih Zen button)
+        // Glowing Big Tactile Ring Button
         GlassCard(
             shape = CircleShape,
             containerColor = SurfaceCard,

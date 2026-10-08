@@ -21,7 +21,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 
 private const val DEFAULT_ZONE = "Asia/Jakarta"
-enum class AppScreen { HOME, QURAN, PRAYER, BOOKMARKS, SETTINGS, TASBIH }
+enum class AppScreen { HOME, QURAN, PRAYER, CALENDAR, BOOKMARKS, SETTINGS, TASBIH }
 
 data class UiState(
     val screen: AppScreen = AppScreen.HOME,
@@ -65,6 +65,8 @@ data class UiState(
         }
     val selectedPrayerDay: PrayerDay?
         get() = prayerData?.jadwal?.get(selectedPrayerDate.toString())
+    val todayPrayerDay: PrayerDay?
+        get() = prayerData?.jadwal?.get(LocalDate.now(runCatching { ZoneId.of(preferences.zone) }.getOrDefault(ZoneId.of(DEFAULT_ZONE))).toString()) ?: selectedPrayerDay
 }
 
 class AppViewModel(application: Application, private val savedState: SavedStateHandle) : AndroidViewModel(application) {
@@ -122,7 +124,7 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
     fun setScreen(screen: AppScreen) {
         savedState["screen"] = screen.name
         _state.update { it.copy(screen = screen) }
-        if (screen == AppScreen.PRAYER) refreshPrayerForTodayIfNeeded()
+        if (screen == AppScreen.PRAYER || screen == AppScreen.CALENDAR) refreshPrayerForTodayIfNeeded()
     }
     fun setSurahQuery(query: String) = _state.update { it.copy(surahQuery = query) }
     fun loadSurahs() {

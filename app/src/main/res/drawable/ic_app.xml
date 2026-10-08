@@ -3,17 +3,67 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- Deep AMOLED Emerald Background Rounded Tile -->
     <path
-        android:fillColor="#16181B"
-        android:pathData="M16,16h76a8,8 0 0,1 8,8v60a8,8 0 0,1 -8,8h-76a8,8 0 0,1 -8,-8v-60a8,8 0 0,1 8,-8z" />
+        android:fillColor="#075E54"
+        android:pathData="M16,6h76a10,10 0 0,1 10,10v76a10,10 0 0,1 -10,10h-76a10,10 0 0,1 -10,-10v-76a10,10 0 0,1 10,-10z" />
+
+    <!-- Inner Darker Layer for Depth -->
     <path
-        android:fillColor="#FF9E00"
-        android:pathData="M34,32h14c6,0 10,4 10,10v34h-24z" />
+        android:fillColor="#0B1A17"
+        android:pathData="M20,10h68a8,8 0 0,1 8,8v68a8,8 0 0,1 -8,8h-68a8,8 0 0,1 -8,-8v-68a8,8 0 0,1 8,-8z" />
+
+    <!-- Islamic Eight-Pointed Star (Rub el Hizb) Outer Subtle Glow -->
     <path
-        android:fillColor="#10B981"
-        android:pathData="M60,32h14v44h-24v-34c0,-6 4,-10 10,-10z" />
+        android:fillColor="#154A3E"
+        android:pathData="M54,16 L64,26 L78,26 L78,40 L88,50 L88,58 L78,68 L78,82 L64,82 L54,92 L44,82 L30,82 L30,68 L20,58 L20,50 L30,40 L30,26 L44,26 Z" />
+
     <path
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="2"
-        android:pathData="M54,26v56" />
+        android:strokeColor="#FFB020"
+        android:strokeWidth="1.2"
+        android:strokeAlpha="0.4"
+        android:fillColor="#00000000"
+        android:pathData="M54,20 L62,28 L74,28 L74,40 L82,48 L82,60 L74,68 L74,80 L62,80 L54,88 L46,80 L34,80 L34,68 L26,60 L26,48 L34,40 L34,28 L46,28 Z" />
+
+    <!-- Open Holy Quran (Mushaf) Base Shadow -->
+    <path
+        android:fillColor="#06120E"
+        android:pathData="M54,44 C46,38 34,40 26,44 L26,74 C34,70 46,68 54,74 C62,68 74,70 82,74 L82,44 C74,40 62,38 54,44 Z" />
+
+    <!-- Left Page of Holy Quran (Luminous Warm Parchment) -->
+    <path
+        android:fillColor="#F8F4EA"
+        android:pathData="M54,42 C46,36 34,38 27,42 L27,70 C34,66 46,64 54,70 Z" />
+
+    <!-- Right Page of Holy Quran (Luminous Warm Parchment) -->
+    <path
+        android:fillColor="#ECE6D8"
+        android:pathData="M54,42 C62,36 74,38 81,42 L81,70 C74,66 62,64 54,70 Z" />
+
+    <!-- Spine / Center Binding of Quran (Gold Inlay) -->
+    <path
+        android:fillColor="#E59807"
+        android:pathData="M53,41h2v30h-2z" />
+
+    <!-- Golden Arabic Script Embellishments on Left Page -->
+    <path
+        android:fillColor="#FFB020"
+        android:pathData="M33,48h14v2h-14z M32,54h15v2h-15z M34,60h13v2h-13z" />
+
+    <!-- Golden Arabic Script Embellishments on Right Page -->
+    <path
+        android:fillColor="#E59807"
+        android:pathData="M61,48h14v2h-14z M61,54h15v2h-15z M61,60h13v2h-13z" />
+
+    <!-- Radiance / Golden Crescent Crown at the Top -->
+    <path
+        android:fillColor="#FFB020"
+        android:pathData="M54,26 C57,26 59.5,28.5 59.5,31.5 C59.5,33.5 58,35 56.5,36 C57.5,35 58,33.5 58,32 C58,29.8 56.2,28 54,28 C53,28 52.2,28.4 51.5,29 C52.2,27.2 53,26 54,26 Z" />
+
+    <!-- Small Golden Star above the Crescent -->
+    <path
+        android:fillColor="#FFE082"
+        android:pathData="M54,22 L55,24.5 L57.5,24.5 L55.5,26 L56.5,28.5 L54,27 L51.5,28.5 L52.5,26 L50.5,24.5 L53,24.5 Z" />
+
 </vector>

@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,8 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.ui.theme.*
@@ -57,16 +59,20 @@ fun QuranHeroBanner(
             )
             .padding(20.dp)
     ) {
-        // Subtle Islamic Watermark Glyph (۞) in background bottom-right (Yasin style)
+        // Islamic Watermark Glyph (۞) in background bottom-right
         Text(
             text = arabicWatermark,
             fontFamily = ArabicFontFamily,
-            fontSize = 110.sp,
-            color = Color.White.copy(alpha = 0.10f),
+            fontSize = 115.sp,
+            color = Color.White.copy(alpha = 0.12f),
             textAlign = TextAlign.End,
+            style = TextStyle(
+                textDirection = TextDirection.Rtl,
+                platformStyle = PlatformTextStyle(includeFontPadding = false)
+            ),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 16.dp, y = 28.dp)
+                .offset(x = 18.dp, y = 28.dp)
         )
 
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -76,10 +82,10 @@ fun QuranHeroBanner(
                 verticalAlignment = Alignment.Top
             ) {
                 Column(modifier = Modifier.weight(1f, fill = false)) {
-                    // Eyebrow Status Pill
+                    // Eyebrow Status Tag
                     if (tag != null) {
                         Surface(
-                            color = Color.Black.copy(alpha = 0.30f),
+                            color = Color.Black.copy(alpha = 0.32f),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
                                 .border(
@@ -109,12 +115,13 @@ fun QuranHeroBanner(
                         }
                     }
 
-                    // Grand Title
+                    // Grand Display Title
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White,
+                        lineHeight = 28.sp
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -128,7 +135,7 @@ fun QuranHeroBanner(
                     )
                 }
 
-                // Trailing Action Button (Quick Settings / More)
+                // Trailing Action Button
                 if (trailingContent != null) {
                     Spacer(modifier = Modifier.width(12.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -137,21 +144,26 @@ fun QuranHeroBanner(
                 }
             }
 
-            // Arabic calligraphy quote line if provided (Yasin style)
+            // Arabic Calligraphy Quote (RTL, right-aligned)
             if (arabicQuote != null) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = arabicQuote,
                     fontFamily = ArabicFontFamily,
-                    fontSize = 22.sp,
-                    lineHeight = 38.sp,
+                    fontSize = 23.sp,
+                    lineHeight = 42.sp,
+                    lineHeightStyle = ArabicLineHeightStyle,
                     color = Color.White.copy(alpha = 0.95f),
                     textAlign = TextAlign.End,
+                    style = TextStyle(
+                        textDirection = TextDirection.Rtl,
+                        platformStyle = PlatformTextStyle(includeFontPadding = false)
+                    ),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            // Stat Badges Row
+            // Stat Badges
             if (badges.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(14.dp))
                 Row(
