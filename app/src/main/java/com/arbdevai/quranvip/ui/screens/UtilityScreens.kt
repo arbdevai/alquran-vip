@@ -34,7 +34,6 @@ import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.GlassCard
-import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 import java.time.LocalDate
 import java.time.format.TextStyle as JavaTextStyle
@@ -56,29 +55,39 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .fillMaxSize()
             .background(BgCanvas)
             .verticalScroll(rememberScrollState())
-            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        // 1. Signature Hero Card Jadwal Salat
-        val cityLokasi = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS Otomatis"
-        val hijriSummary = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Jadwal Waktu Salat"
-        QuranHeroBanner(
-            title = "Jadwal Salat Harian",
-            subtitle = "$cityLokasi · $hijriSummary",
-            tag = "API MUSLIM V3",
-            arabicWatermark = "۞",
-            badges = listOf(state.preferences.city?.lokasi ?: "Lokasi GPS", state.preferences.zone, "Kemenag RI"),
-            trailingContent = {
+        // Clean Header (Title + Location actions)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = "Jadwal Salat",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                val cityText = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS"
+                Text(
+                    text = cityText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AmberAccent
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilledIconButton(
                     onClick = { cityDialog = true },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.35f),
-                        contentColor = Color.White
+                        containerColor = SurfaceCard,
+                        contentColor = TextPrimary
                     ),
-                    modifier = Modifier.size(38.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(Icons.Default.LocationCity, contentDescription = "Pilih Kota")
                 }
-                Spacer(modifier = Modifier.width(6.dp))
                 FilledIconButton(
                     onClick = {
                         permissionLauncher.launch(
@@ -89,22 +98,22 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                         )
                     },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = Color.Black.copy(alpha = 0.35f),
-                        contentColor = Color.White
+                        containerColor = SurfaceCard,
+                        contentColor = AmberAccent
                     ),
-                    modifier = Modifier.size(38.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(Icons.Default.MyLocation, contentDescription = "GPS Otomatis")
                 }
             }
-        )
+        }
 
         if (state.locationLoading) {
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CircularProgressIndicator(color = AmberAccent, modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
                 Spacer(Modifier.width(8.dp))
-                Text("Mendeteksi koordinat GPS...", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
+                Text("Mendeteksi lokasi GPS...", style = MaterialTheme.typography.bodySmall, color = TextSecondary)
             }
         }
 
@@ -130,61 +139,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
 
         Spacer(Modifier.height(16.dp))
 
-        // Tombol Pintas ke Kalender Hijriyah Terpisah
-        GlassCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(18.dp),
-            onClick = { viewModel.setScreen(AppScreen.CALENDAR) }
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(CatQuran.copy(alpha = 0.20f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = null,
-                            tint = CatQuran,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = "Buka Kalender Hijriyah",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = TextPrimary
-                        )
-                        Text(
-                            text = "Konversi penanggalan & jadwal bulanan",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = TextSecondary
-                        )
-                    }
-                }
-                Icon(
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = null,
-                    tint = AmberAccent,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Today's Detailed Prayer Times
+        // Full Today Prayer Times Table
         val day = state.todayPrayerDay ?: state.selectedPrayerDay
         when {
             state.prayerLoading -> {
@@ -198,7 +153,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(22.dp)
                 ) {
-                    Column(Modifier.padding(18.dp)) {
+                    Column(Modifier.padding(20.dp)) {
                         Row(
                             Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,36 +161,37 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                         ) {
                             Text(
                                 "Waktu Salat Hari Ini",
-                                color = AmberAccent,
+                                color = TextPrimary,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 day.tanggal,
-                                color = TextSecondary,
+                                color = AmberAccent,
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
-                        Spacer(Modifier.height(14.dp))
+                        Spacer(Modifier.height(16.dp))
                         day.times().forEach { (name, time) ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
+                                    .padding(vertical = 10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     name,
                                     color = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) TextPrimary else TextSecondary,
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) FontWeight.Bold else FontWeight.Normal
                                 )
                                 Text(
                                     time,
                                     color = AmberAccent,
                                     style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp
                                 )
                             }
                             HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
@@ -250,7 +206,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 ) {
                     Text(
                         text = if (state.preferences.city == null)
-                            "Pilih kota lokasi Anda atau aktifkan GPS untuk melihat jadwal salat akurat"
+                            "Pilih kota atau aktifkan GPS untuk melihat waktu salat"
                         else "Jadwal salat belum tersedia",
                         color = TextSecondary,
                         style = MaterialTheme.typography.bodyMedium,
@@ -274,19 +230,31 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             .fillMaxSize()
             .background(BgCanvas)
             .verticalScroll(rememberScrollState())
-            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        // Hero Card Kalender Hijriyah & Masehi
-        val hijriText = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Kalender Hijriyah"
-        QuranHeroBanner(
-            title = "Kalender Hijriyah & Masehi",
-            subtitle = hijriText,
-            tag = "PENANGGALAN ISLAM",
-            arabicWatermark = "۞",
-            badges = listOf(state.selectedCalendar?.ce?.today ?: "Masehi", state.preferences.zone)
-        )
+        // Clean Header (Title + Hijri Info)
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = "Kalender Hijriah",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                val hijriText = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Penanggalan Islam"
+                Text(
+                    text = hijriText,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AmberAccent
+                )
+            }
+        }
 
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(16.dp))
 
         // Month Selector (Bulan Lalu / Bulan Depan)
         val indonesianMonths = listOf(
@@ -317,7 +285,7 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         when {
             state.calendarLoading -> {
                 Text(
-                    "Memuat kalender Hijriah...",
+                    "Memuat kalender...",
                     color = TextSecondary,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -354,7 +322,7 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
 
         Spacer(Modifier.height(18.dp))
 
-        // Prayer Schedule for Selected Calendar Date
+        // Selected Calendar Date Details
         val selectedDay = state.selectedPrayerDay
         if (selectedDay != null) {
             GlassCard(
@@ -363,7 +331,7 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             ) {
                 Column(Modifier.padding(18.dp)) {
                     Text(
-                        "Jadwal Salat: ${selectedDay.tanggal}",
+                        "Jadwal: ${selectedDay.tanggal}",
                         color = AmberAccent,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
@@ -546,17 +514,16 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
         modifier = modifier
             .fillMaxSize()
             .background(BgCanvas),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // 1. Hero Card Bookmark (Yasin style with ۞)
         item {
-            QuranHeroBanner(
-                title = "Ayat Favorit",
-                subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
-                tag = "TADARUS PRIBADI",
-                arabicWatermark = "۞",
-                badges = listOf("${state.preferences.bookmarks.size} Disimpan", "Tadarus Harian")
+            Text(
+                text = "Ayat Disimpan",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,
+                modifier = Modifier.padding(vertical = 4.dp)
             )
         }
 
@@ -637,19 +604,18 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .fillMaxSize()
             .background(BgCanvas)
             .verticalScroll(rememberScrollState())
-            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. Hero Card Tasbih (Yasin style with ۞)
-        QuranHeroBanner(
-            title = "Tasbih Digital VIP",
-            subtitle = selectedZikir,
-            tag = "ZIKIR HARIAN",
-            arabicWatermark = "۞",
-            badges = listOf("Haptic Touch", "Target 33x / 99x", "Hitungan: ${state.preferences.tasbih}")
+        Text(
+            text = "Tasbih Digital",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
         )
 
-        Spacer(Modifier.height(20.dp))
+        Spacer(Modifier.height(16.dp))
 
         // Preset Chips
         Row(
@@ -673,7 +639,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
 
         Spacer(Modifier.height(36.dp))
 
-        // Glowing Big Tactile Ring Button
+        // Big Tactile Ring Button
         GlassCard(
             shape = CircleShape,
             containerColor = SurfaceCard,
@@ -711,7 +677,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "Ketuk untuk berdzikir",
+                    text = selectedZikir,
                     style = MaterialTheme.typography.bodySmall,
                     color = TextSecondary
                 )
@@ -740,16 +706,14 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             .fillMaxSize()
             .background(BgCanvas)
             .verticalScroll(rememberScrollState())
-            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp)
+            .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        // 1. Hero Card Settings
-        val qoriName = Reciters.names[state.preferences.qori] ?: "Qari Pilihan"
-        QuranHeroBanner(
-            title = "Pengaturan VIP",
-            subtitle = "Preferensi Bacaan, Qari, & Waktu Salat",
-            tag = "PREFERENSI APLIKASI",
-            arabicWatermark = "۞",
-            badges = listOf(qoriName, "${state.preferences.fontSize} sp", state.preferences.zone)
+        Text(
+            text = "Pengaturan",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            modifier = Modifier.padding(vertical = 4.dp)
         )
 
         Spacer(Modifier.height(18.dp))

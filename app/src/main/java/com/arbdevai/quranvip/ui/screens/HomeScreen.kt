@@ -35,22 +35,21 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
         modifier = modifier
             .fillMaxSize()
             .background(BgCanvas),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 1. Signature Emerald Hero Banner (Yasin style with subtle ۞ & Hijri date)
+        // 1. Signature Emerald Hero Banner (Only on Home screen)
         item {
             val hijriText = state.selectedCalendar?.hijr?.let {
                 "${it.day} ${it.monthName} ${it.year} H"
-            } ?: "Jadwal Salat & Al-Qur'an Digital"
-            val cityText = state.preferences.city?.lokasi ?: "Lokasi GPS Otomatis"
+            } ?: "Kalender Hijriah"
+            val cityText = state.preferences.city?.lokasi ?: "Lokasi GPS"
 
             QuranHeroBanner(
                 title = "Al-Qur'an VIP",
                 subtitle = "$hijriText · $cityText",
-                tag = "BISMILLAHIRRAHMANIRRAHIM",
                 arabicQuote = "اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ",
-                badges = listOf("114 Surah", "30 Juz", "Kemenag RI"),
+                badges = listOf(cityText, hijriText),
                 trailingContent = {
                     FilledIconButton(
                         onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
@@ -76,10 +75,10 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             }
         }
 
-        // 3. 2-Column App Grid Menu (Direct inspiration from Sahalarbani/yasin)
+        // 3. 2-Column Menu Grid (Clean Human Copy, No AI Fluff)
         item {
             Text(
-                text = "Fitur Utama",
+                text = "Menu Utama",
                 style = MaterialTheme.typography.titleMedium,
                 color = TextPrimary,
                 fontWeight = FontWeight.Bold,
@@ -94,7 +93,7 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                 ) {
                     FeatureTile(
                         title = "Al-Qur'an",
-                        subtitle = "114 Surah & Audio Qari",
+                        subtitle = "114 Surah & Audio",
                         icon = Icons.Default.MenuBook,
                         gradient = listOf(TileQuranStart, TileQuranEnd),
                         modifier = Modifier.weight(1f),
@@ -102,7 +101,7 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                     )
                     FeatureTile(
                         title = "Jadwal Salat",
-                        subtitle = "Waktu Adzan & Arah",
+                        subtitle = "Waktu Adzan Harian",
                         icon = Icons.Default.AccessTime,
                         gradient = listOf(TileJadwalStart, TileJadwalEnd),
                         modifier = Modifier.weight(1f),
@@ -331,12 +330,12 @@ private fun TodayPrayerCard(
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = "Jadwal Salat Hari Ini",
+                            text = "Waktu Salat Hari Ini",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = TextPrimary
                         )
-                        val cityLokasi = state.preferences.city?.lokasi ?: "Sentuh untuk tentukan kota"
+                        val cityLokasi = state.preferences.city?.lokasi ?: "Lokasi GPS"
                         Text(
                             text = cityLokasi,
                             style = MaterialTheme.typography.labelSmall,
@@ -351,7 +350,7 @@ private fun TodayPrayerCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            val prayerDay = state.selectedPrayerDay
+            val prayerDay = state.todayPrayerDay ?: state.selectedPrayerDay
             if (prayerDay != null) {
                 val times = prayerDay.times().filter {
                     it.first in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")
@@ -394,7 +393,7 @@ private fun TodayPrayerCard(
                 ) {
                     Text(
                         text = if (state.preferences.city == null)
-                            "Pilih kota atau aktifkan GPS untuk menampilkan jadwal salat otomatis"
+                            "Pilih kota atau aktifkan GPS untuk menampilkan waktu salat"
                         else "Memuat waktu salat...",
                         color = TextSecondary,
                         style = MaterialTheme.typography.bodySmall,

@@ -34,7 +34,6 @@ import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.FloatingQuranController
 import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranAyahCard
-import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
@@ -52,30 +51,40 @@ private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: M
         modifier = modifier
             .fillMaxSize()
             .background(BgCanvas),
-        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 24.dp),
+        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // 1. Hero Banner Al-Qur'an (Yasin emerald theme with watermark ۞)
+        // 1. Clean Header (No Fluff Banner)
         item {
-            QuranHeroBanner(
-                title = "Al-Qur'an Al-Karim",
-                subtitle = "114 Surah · 30 Juz · 6236 Ayat",
-                tag = "KITABULLAH",
-                arabicWatermark = "۞",
-                badges = listOf("114 Surah", "30 Juz", "Kemenag RI"),
-                trailingContent = {
-                    FilledIconButton(
-                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = Color.Black.copy(alpha = 0.35f),
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
-                    }
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = "Al-Qur'an",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    Text(
+                        text = "114 Surah",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = TextSecondary
+                    )
                 }
-            )
+                FilledIconButton(
+                    onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = SurfaceCard,
+                        contentColor = TextPrimary
+                    ),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                }
+            }
         }
 
         // 2. Search Field Bar
@@ -109,7 +118,7 @@ private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: M
         // 3. Surah List Content
         when {
             state.quranLoading && state.surahs.isEmpty() -> {
-                item { LoadingView("Memuat 114 Surah Al-Qur'an...") }
+                item { LoadingView("Memuat 114 Surah...") }
             }
             state.quranError != null && state.surahs.isEmpty() -> {
                 item { ErrorView(state.quranError, viewModel::loadSurahs) }
@@ -210,49 +219,21 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                 }
             }
             else -> {
+                // Sleek Reader Top Bar
+                ReaderHeaderBar(
+                    reader = reader,
+                    onBack = viewModel::closeReader,
+                    onPickQori = { showReciters = true }
+                )
+
                 Box(Modifier.fillMaxSize()) {
                     LazyColumn(
                         state = listState,
-                        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
+                        contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 12.dp, bottom = 100.dp),
                         verticalArrangement = Arrangement.spacedBy(14.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // 1. Hero Card Surah Reader Header (Yasin style with ۞)
-                        item {
-                            val qoriName = Reciters.names[state.preferences.qori] ?: "Qari Pilihan"
-                            QuranHeroBanner(
-                                title = "Surah ${reader.namaLatin}",
-                                subtitle = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
-                                tag = "SURAH KE-${reader.nomor}",
-                                arabicWatermark = "۞",
-                                badges = listOf(reader.tempatTurun, "${reader.jumlahAyat} Ayat", qoriName),
-                                trailingContent = {
-                                    FilledIconButton(
-                                        onClick = { showReciters = true },
-                                        colors = IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = Color.Black.copy(alpha = 0.35f),
-                                            contentColor = Color.White
-                                        ),
-                                        modifier = Modifier.size(38.dp)
-                                    ) {
-                                        Icon(Icons.Default.RecordVoiceOver, contentDescription = "Pilih Qari")
-                                    }
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    FilledIconButton(
-                                        onClick = viewModel::closeReader,
-                                        colors = IconButtonDefaults.filledIconButtonColors(
-                                            containerColor = Color.Black.copy(alpha = 0.35f),
-                                            contentColor = Color.White
-                                        ),
-                                        modifier = Modifier.size(38.dp)
-                                    ) {
-                                        Icon(Icons.Default.Close, contentDescription = "Tutup")
-                                    }
-                                }
-                            )
-                        }
-
-                        // 2. Bismillah Decorative Card (kecuali Surah At-Taubah no 9 dan Al-Fatihah no 1)
+                        // Bismillah Decorative Card (except Surah At-Taubah no 9 and Al-Fatihah no 1)
                         if (reader.nomor != 1 && reader.nomor != 9) {
                             item {
                                 GlassCard(
@@ -283,7 +264,7 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                             }
                         }
 
-                        // 3. Ayat Cards (Three-tier hierarchy from Sahalarbani/yasin)
+                        // Ayat Cards (Clean 3-Tier Hierarchy: Right Arabic, Left Indo)
                         items(reader.ayat, key = { it.nomorAyat }) { ayah ->
                             val playing = state.playback.playing &&
                                 state.playback.surah == reader.nomor &&
@@ -310,7 +291,7 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                         }
                     }
 
-                    // Floating Bottom Toolbar (A- / A+ & Putar Surah)
+                    // Floating Bottom Toolbar
                     FloatingQuranController(
                         isPlayingAll = state.playback.playing && state.playback.surah == reader.nomor && state.playback.ayah == 0,
                         onFontDecrease = { viewModel.setFontSize(state.preferences.fontSize - 1) },
@@ -328,6 +309,49 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
     }
     if (state.tafsirAyah != null) {
         TafsirDialog(state, viewModel)
+    }
+}
+
+@Composable
+private fun ReaderHeaderBar(
+    reader: Surah,
+    onBack: () -> Unit,
+    onPickQori: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(SurfaceCard)
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.Default.ArrowBack, contentDescription = "Kembali", tint = TextPrimary)
+        }
+        Spacer(modifier = Modifier.width(6.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Surah ${reader.namaLatin}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary
+            )
+            Text(
+                text = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
+                style = MaterialTheme.typography.labelSmall,
+                color = TextSecondary
+            )
+        }
+        Text(
+            text = reader.nama,
+            fontFamily = ArabicFontFamily,
+            fontSize = 24.sp,
+            color = AmberAccent,
+            modifier = Modifier.padding(end = 8.dp)
+        )
+        IconButton(onClick = onPickQori) {
+            Icon(Icons.Default.RecordVoiceOver, contentDescription = "Pilih Qari", tint = AmberAccent)
+        }
     }
 }
 
@@ -402,7 +426,7 @@ private fun TafsirDialog(state: UiState, viewModel: AppViewModel) {
             when {
                 state.tafsirLoading -> CircularProgressIndicator(color = AmberAccent)
                 state.tafsirError != null -> Text(state.tafsirError, color = TextSecondary)
-                text != null -> Text(text, color = TextTranslation, lineHeight = 22.sp)
+                text != null -> Text(text, color = TextTranslation, lineHeight = 24.sp)
                 else -> Text("Tafsir untuk ayat ini belum tersedia.", color = TextSecondary)
             }
         },

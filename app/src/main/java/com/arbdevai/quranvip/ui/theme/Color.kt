@@ -64,7 +64,7 @@ val CatHadroh = Color(0xFF5E5CE6)
 // ==========================================
 val GlassBackground = Color(0xB8121418)
 val GlassSurface = Color(0xDB161A22)          // Rich translucent card
-val GlassNavbar = Color(0xF2141720)           // Floating island navigation bar
+val GlassNavbar = Color(0xEA141720)           // Floating island navigation bar (translucent frosted glass)
 val GlassBorder = Color(0x29FFFFFF)           // Specular rim border (16% white)
 val GlassBorderGlow = Color(0x52FFB020)       // Warm gold active glow
 val GlassHighlight = Color(0x1FFFFFFF)

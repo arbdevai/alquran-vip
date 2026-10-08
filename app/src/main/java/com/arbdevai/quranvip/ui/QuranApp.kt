@@ -75,12 +75,8 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
             .background(BgCanvas)
             .statusBarsPadding()
     ) {
-        // Screen Content Container
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = if (state.reader == null) 84.dp else 0.dp)
-        ) {
+        // Screen Content spans full height so it scrolls BEHIND the floating dock
+        Box(modifier = Modifier.fillMaxSize()) {
             when (state.screen) {
                 AppScreen.HOME -> HomeScreen(state, viewModel)
                 AppScreen.QURAN -> QuranScreen(state, viewModel)
@@ -92,7 +88,7 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
             }
         }
 
-        // True Floating Island Navigation Bar (5 Main Navigation Destinations)
+        // True Floating Island Navigation Bar - No solid black bar behind it
         if (state.reader == null) {
             FloatingIslandNavbar(
                 currentScreen = state.screen,
@@ -100,7 +96,7 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                    .padding(horizontal = 20.dp, vertical = 14.dp)
             )
         }
     }
@@ -115,23 +111,23 @@ private fun FloatingIslandNavbar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .height(66.dp)
+            .height(64.dp)
             .border(
                 BorderStroke(
                     1.dp,
                     Brush.linearGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.22f),
+                            Color.White.copy(alpha = 0.25f),
                             Color.White.copy(alpha = 0.05f),
                             AmberAccent.copy(alpha = 0.35f)
                         )
                     )
                 ),
-                RoundedCornerShape(33.dp)
+                RoundedCornerShape(32.dp)
             ),
-        shape = RoundedCornerShape(33.dp),
+        shape = RoundedCornerShape(32.dp),
         color = GlassNavbar,
-        shadowElevation = 16.dp
+        shadowElevation = 18.dp
     ) {
         Row(
             modifier = Modifier
@@ -174,7 +170,7 @@ private fun IslandNavItem(
             modifier = Modifier
                 .size(32.dp)
                 .clip(CircleShape)
-                .background(if (selected) AmberAccent.copy(alpha = 0.20f) else Color.Transparent),
+                .background(if (selected) AmberAccent.copy(alpha = 0.18f) else Color.Transparent),
             contentAlignment = Alignment.Center
         ) {
             Icon(
