@@ -1,5 +1,6 @@
 package com.arbdevai.quranvip.ui.components
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +27,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.data.model.Ayah
 import com.arbdevai.quranvip.ui.theme.*
+
+@Composable
+fun AudioWaveVisualizer(
+    color: Color = AmberAccent,
+    modifier: Modifier = Modifier
+) {
+    val transition = rememberInfiniteTransition(label = "audioWave")
+    val h1 by transition.animateFloat(
+        initialValue = 4f, targetValue = 18f,
+        animationSpec = infiniteRepeatable(tween(450, easing = LinearEasing), RepeatMode.Reverse),
+        label = "h1"
+    )
+    val h2 by transition.animateFloat(
+        initialValue = 16f, targetValue = 6f,
+        animationSpec = infiniteRepeatable(tween(550, easing = LinearEasing), RepeatMode.Reverse),
+        label = "h2"
+    )
+    val h3 by transition.animateFloat(
+        initialValue = 6f, targetValue = 20f,
+        animationSpec = infiniteRepeatable(tween(400, easing = LinearEasing), RepeatMode.Reverse),
+        label = "h3"
+    )
+    val h4 by transition.animateFloat(
+        initialValue = 14f, targetValue = 8f,
+        animationSpec = infiniteRepeatable(tween(500, easing = LinearEasing), RepeatMode.Reverse),
+        label = "h4"
+    )
+
+    Row(
+        modifier = modifier.height(20.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(Modifier.width(3.dp).height(h1.dp).clip(CircleShape).background(color))
+        Box(Modifier.width(3.dp).height(h2.dp).clip(CircleShape).background(color))
+        Box(Modifier.width(3.dp).height(h3.dp).clip(CircleShape).background(color))
+        Box(Modifier.width(3.dp).height(h4.dp).clip(CircleShape).background(color))
+    }
+}
 
 @Composable
 fun QuranAyahCard(
@@ -56,19 +97,28 @@ fun QuranAyahCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(if (isPlaying) AmberAccent else SurfacePill),
-                    contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Text(
-                        text = "${ayah.nomorAyat}",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isPlaying) Color.Black else Color.White
-                    )
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(if (isPlaying) AmberAccent else SurfacePill),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "${ayah.nomorAyat}",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isPlaying) Color.Black else Color.White
+                        )
+                    }
+
+                    if (isPlaying) {
+                        AudioWaveVisualizer(color = AmberAccent)
+                    }
                 }
 
                 Row(
