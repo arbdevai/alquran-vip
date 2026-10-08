@@ -149,13 +149,13 @@ fun QuranHeroBanner(
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
                     text = arabicQuote,
-                    fontFamily = ArabicFontFamily,
-                    fontSize = 23.sp,
-                    lineHeight = 42.sp,
-                    lineHeightStyle = ArabicLineHeightStyle,
                     color = Color.White.copy(alpha = 0.95f),
                     textAlign = TextAlign.End,
                     style = TextStyle(
+                        fontFamily = ArabicFontFamily,
+                        fontSize = 23.sp,
+                        lineHeight = 42.sp,
+                        lineHeightStyle = ArabicLineHeightStyle,
                         textDirection = TextDirection.Rtl,
                         platformStyle = PlatformTextStyle(includeFontPadding = false)
                     ),
