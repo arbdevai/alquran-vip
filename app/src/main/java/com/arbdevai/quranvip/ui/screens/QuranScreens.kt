@@ -267,13 +267,13 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                                     ) {
                                         Text(
                                             text = "بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ",
-                                            fontFamily = ArabicFontFamily,
-                                            fontSize = 28.sp,
-                                            lineHeight = 50.sp,
-                                            lineHeightStyle = ArabicLineHeightStyle,
                                             color = AmberAccent,
                                             textAlign = TextAlign.Center,
                                             style = TextStyle(
+                                                fontFamily = ArabicFontFamily,
+                                                fontSize = 28.sp,
+                                                lineHeight = 50.sp,
+                                                lineHeightStyle = ArabicLineHeightStyle,
                                                 textDirection = TextDirection.Rtl,
                                                 platformStyle = PlatformTextStyle(includeFontPadding = false)
                                             )
