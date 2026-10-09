@@ -2,8 +2,10 @@ package com.arbdevai.quranvip.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -25,6 +27,7 @@ import com.arbdevai.quranvip.data.model.ReadingPosition
 import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
+import com.arbdevai.quranvip.ui.components.AudioWaveVisualizer
 import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
@@ -38,7 +41,7 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 1. Signature Emerald Hero Banner (Only on Home screen)
+        // 1. Signature Emerald Hero Banner (Yasin Inspiration)
         item {
             val hijriText = state.selectedCalendar?.hijr?.let {
                 "${it.day} ${it.monthName} ${it.year} H"
@@ -65,7 +68,51 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             )
         }
 
-        // 2. Terakhir Dibaca Widget (Last Read)
+        // 2. Now Playing Mini Bar (if audio is active)
+        if (state.playback.playing) {
+            item {
+                NowPlayingCard(
+                    title = state.playback.title.ifBlank { "Sedang Memutar Audio" },
+                    subtitle = state.playback.subtitle,
+                    onToggle = viewModel::togglePlayback,
+                    onStop = viewModel::stopPlayback,
+                    onClick = {
+                        if (state.playback.surah > 0) {
+                            viewModel.openSurah(state.playback.surah, state.playback.ayah.coerceAtLeast(1))
+                        }
+                    }
+                )
+            }
+        }
+
+        // 3. Quick Surah Shortcuts (Yasin, Al-Mulk, Al-Kahfi, Al-Waqi'ah, Ayat Kursi)
+        item {
+            Column {
+                Text(
+                    text = "Surah Pilihan",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = TextPrimary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    QuickSurahPill("Yasin", "36") { viewModel.openSurah(36, 1) }
+                    QuickSurahPill("Al-Mulk", "67") { viewModel.openSurah(67, 1) }
+                    QuickSurahPill("Al-Kahfi", "18") { viewModel.openSurah(18, 1) }
+                    QuickSurahPill("Al-Waqi'ah", "56") { viewModel.openSurah(56, 1) }
+                    QuickSurahPill("Ar-Rahman", "55") { viewModel.openSurah(55, 1) }
+                    QuickSurahPill("Ayat Kursi", "2:255") { viewModel.openSurah(2, 255) }
+                }
+            }
+        }
+
+        // 4. Terakhir Dibaca Widget (Last Read)
         state.preferences.lastRead?.let { lastRead ->
             item {
                 LastReadCard(
@@ -75,7 +122,7 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             }
         }
 
-        // 3. 2-Column Menu Grid (Clean Human Copy, No AI Fluff)
+        // 5. 2-Column Menu Grid (Clean & Modern)
         item {
             Text(
                 text = "Menu Utama",
@@ -157,12 +204,106 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             }
         }
 
-        // 4. Jadwal Shalat Hari Ini (Interactive 5 times chips)
+        // 6. Jadwal Shalat Hari Ini
         item {
             TodayPrayerCard(
                 state = state,
                 onOpenPrayer = { viewModel.setScreen(AppScreen.PRAYER) }
             )
+        }
+    }
+}
+
+@Composable
+private fun QuickSurahPill(name: String, number: String, onClick: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = SurfaceCard,
+        modifier = Modifier
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .clip(CircleShape)
+                    .background(AmberAccent.copy(alpha = 0.20f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = number,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AmberAccent
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = name,
+                style = MaterialTheme.typography.titleSmall,
+                color = TextPrimary
+            )
+        }
+    }
+}
+
+@Composable
+private fun NowPlayingCard(
+    title: String,
+    subtitle: String,
+    onToggle: () -> Unit,
+    onStop: () -> Unit,
+    onClick: () -> Unit
+) {
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        borderColor = AmberAccent.copy(alpha = 0.60f),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AudioWaveVisualizer(color = AmberAccent)
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (subtitle.isNotBlank()) {
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = AmberAccent,
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                IconButton(onClick = onToggle) {
+                    Icon(Icons.Default.Pause, contentDescription = "Jeda", tint = AmberAccent)
+                }
+                IconButton(onClick = onStop) {
+                    Icon(Icons.Default.Close, contentDescription = "Tutup", tint = TextSecondary)
+                }
+            }
         }
     }
 }
