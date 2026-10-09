@@ -3,8 +3,12 @@ package com.arbdevai.quranvip.ui.screens
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +24,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,14 +41,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.data.model.City
 import com.arbdevai.quranvip.data.model.Reciters
+import com.arbdevai.quranvip.data.model.TasbihHistory
 import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.theme.*
+import com.arbdevai.quranvip.util.CalendarHelper
 import java.time.LocalDate
-import java.time.format.TextStyle as JavaTextStyle
-import java.util.Locale
 
 @Composable
 fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
@@ -240,14 +251,13 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         ) {
             Column {
                 Text(
-                    text = "Kalender Hijriah",
+                    text = "Kalender 3-in-1",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
-                val hijriText = state.selectedCalendar?.hijr?.let { "${it.day} ${it.monthName} ${it.year} H" } ?: "Penanggalan Islam"
                 Text(
-                    text = hijriText,
+                    text = "Nasional · Hijriyah (Arab) · Pasaran Jawa",
                     style = MaterialTheme.typography.labelSmall,
                     color = AmberAccent
                 )
@@ -281,75 +291,57 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             }
         }
 
-        // Hijri Conversion Status
-        when {
-            state.calendarLoading -> {
-                Text(
-                    "Memuat kalender...",
-                    color = TextSecondary,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-            state.calendarError != null -> {
-                Row(
-                    Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(state.calendarError, color = Color(0xFFFF6B6B), style = MaterialTheme.typography.bodySmall)
-                    Spacer(Modifier.width(6.dp))
-                    TextButton(onClick = viewModel::retryCalendar) { Text("Coba Lagi", color = AmberAccent, fontSize = 11.sp) }
-                }
-            }
-            state.selectedCalendar != null -> {
-                Text(
-                    text = "${state.selectedCalendar.hijr.day} ${state.selectedCalendar.hijr.monthName} ${state.selectedCalendar.hijr.year} H",
-                    color = AmberAccent,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
+        Spacer(Modifier.height(10.dp))
 
-        Spacer(Modifier.height(8.dp))
-
-        // Interactive Calendar Grid
+        // 3-in-1 Interactive Calendar Grid (Gregorian, Hijri Arabic Numeral, Javanese Pasaran)
         CalendarGrid(state, viewModel)
 
         Spacer(Modifier.height(18.dp))
 
-        // Selected Calendar Date Details
-        val selectedDay = state.selectedPrayerDay
-        if (selectedDay != null) {
-            GlassCard(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Column(Modifier.padding(18.dp)) {
+        // Selected Date Triple Info Card
+        val selectedDate = state.selectedPrayerDate
+        val selectedTriple = remember(selectedDate) { CalendarHelper.getDayTriple(selectedDate) }
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(Modifier.padding(18.dp)) {
+                Text(
+                    text = "Detail Penanggalan",
+                    color = AmberAccent,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Tanggal Masehi", color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                    Text("${selectedDate.dayOfMonth} $monthName ${selectedDate.year}", color = TextPrimary, fontWeight = FontWeight.SemiBold)
+                }
+                HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Tanggal Hijriyah", color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        "Jadwal: ${selectedDay.tanggal}",
+                        "${selectedTriple.hijriDayNumber} ${selectedTriple.hijriMonthName} ${selectedTriple.hijriYear} H (${selectedTriple.hijriDayArabic})",
                         color = AmberAccent,
-                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(Modifier.height(12.dp))
-                    selectedDay.times().forEach { (name, time) ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 6.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(name, color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
-                            Text(time, color = TextPrimary, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        }
-                        HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
-                    }
+                }
+                HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Pasaran Jawa", color = TextSecondary, style = MaterialTheme.typography.bodyMedium)
+                    Text(selectedTriple.pasaran, color = TextPrimary, fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -360,62 +352,98 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
 private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
     val month = state.prayerMonth
     val first = month.atDay(1)
-    val lead = (first.dayOfWeek.value % 7)
+    val lead = (first.dayOfWeek.value % 7) // 0 for Sunday
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(Modifier.padding(10.dp)) {
+            // Day of Week Header
             Row(Modifier.fillMaxWidth()) {
                 listOf("Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab").forEach { dayLabel ->
                     Text(
                         text = dayLabel,
-                        color = if (dayLabel == "Jum") AmberAccent else TextSecondary,
+                        color = when (dayLabel) {
+                            "Jum" -> AmberAccent
+                            "Min" -> Color(0xFFFF6B6B)
+                            else -> TextSecondary
+                        },
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f).padding(vertical = 4.dp),
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
 
+            // Days cells
             val cells = List(lead) { null } + (1..month.lengthOfMonth()).map { month.atDay(it) }
             cells.chunked(7).forEach { week ->
                 Row(Modifier.fillMaxWidth()) {
                     week.forEach { date ->
-                        val isSelected = date == state.selectedPrayerDate
-                        val isToday = date == LocalDate.now()
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(2.dp)
-                                .height(38.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(
-                                    when {
-                                        isSelected -> AmberAccent
-                                        isToday -> Color.White.copy(alpha = 0.15f)
-                                        else -> Color.Transparent
-                                    }
-                                )
-                                .clickable(enabled = date != null) {
-                                    date?.let(viewModel::setPrayerDate)
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (date != null) {
+                        if (date != null) {
+                            val triple = remember(date) { CalendarHelper.getDayTriple(date) }
+                            val isSelected = date == state.selectedPrayerDate
+                            val isToday = date == LocalDate.now()
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(2.dp)
+                                    .height(58.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(
+                                        when {
+                                            isSelected -> AmberAccent.copy(alpha = 0.22f)
+                                            isToday -> Color.White.copy(alpha = 0.10f)
+                                            else -> SurfaceCard
+                                        }
+                                    )
+                                    .border(
+                                        width = if (isSelected) 1.2.dp else 0.5.dp,
+                                        color = if (isSelected) AmberAccent else if (isToday) Color.White.copy(alpha = 0.4f) else BorderSubtle,
+                                        shape = RoundedCornerShape(10.dp)
+                                    )
+                                    .clickable { viewModel.setPrayerDate(date) }
+                                    .padding(horizontal = 4.dp, vertical = 3.dp)
+                            ) {
+                                // Top-Left: Masehi Number
                                 Text(
-                                    text = "${date.dayOfMonth}",
-                                    color = if (isSelected) Color.Black else TextPrimary,
-                                    fontWeight = if (isSelected || isToday) FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 12.sp
+                                    text = "${triple.gregorianDay}",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) AmberAccent else TextPrimary,
+                                    modifier = Modifier.align(Alignment.TopStart)
+                                )
+
+                                // Top-Right: Pasaran Jawa (Legi, Pahing, etc.)
+                                Text(
+                                    text = triple.pasaran,
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (isSelected) AmberAccent else TextSecondary,
+                                    modifier = Modifier.align(Alignment.TopEnd)
+                                )
+
+                                // Center: Hijri Date in Arabic Numerals (١, ٢, ...)
+                                Text(
+                                    text = triple.hijriDayArabic,
+                                    fontFamily = ArabicFontFamily,
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) AmberAccent else Color(0xFFF8FAFC),
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .offset(y = 5.dp)
                                 )
                             }
+                        } else {
+                            Spacer(modifier = Modifier.weight(1f).padding(2.dp))
                         }
                     }
                     repeat(7 - week.size) {
-                        Spacer(Modifier.weight(1f))
+                        Spacer(Modifier.weight(1f).padding(2.dp))
                     }
                 }
             }
@@ -590,6 +618,7 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
 
 @Composable
 fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
+    val haptic = LocalHapticFeedback.current
     val zikirPresets = listOf(
         "Subhanallah",
         "Alhamdulillah",
@@ -597,7 +626,69 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
         "Astaghfirullah",
         "La ilaha illallah"
     )
-    var selectedZikir by rememberSaveable { mutableStateOf(zikirPresets.first()) }
+
+    val currentTarget = state.preferences.tasbihTarget
+    val currentCount = state.preferences.tasbih
+    val selectedZikir = state.tasbihZikir
+
+    var isPocketLockActive by rememberSaveable { mutableStateOf(false) }
+
+    // Pocket Lock Fullscreen Overlay (Prevents accidental screen touches, Volume key still counts)
+    if (isPocketLockActive) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            isPocketLockActive = false
+                        }
+                    )
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Terkunci",
+                    tint = AmberAccent,
+                    modifier = Modifier.size(54.dp)
+                )
+                Spacer(Modifier.height(18.dp))
+                Text(
+                    text = "$currentCount",
+                    fontSize = 64.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = selectedZikir,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = AmberAccent
+                )
+                Spacer(Modifier.height(28.dp))
+                Text(
+                    text = "Mode Saku Aktif",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Text(
+                    text = "Gunakan tombol volume (+ / -) untuk berzikir\nTahan layar 1 detik untuk buka kunci",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
+            }
+        }
+        return
+    }
 
     Column(
         modifier = modifier
@@ -607,17 +698,42 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Tasbih Digital",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
-        )
+        // Screen Header
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = "Tasbih Digital",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "Tombol Volume HP (+/-) Aktif",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AmberAccent
+                )
+            }
+            FilledTonalButton(
+                onClick = { isPocketLockActive = true },
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = SurfaceCard,
+                    contentColor = TextPrimary
+                )
+            ) {
+                Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text("Kunci Layar", fontSize = 12.sp)
+            }
+        }
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(14.dp))
 
-        // Preset Chips
+        // Preset Zikir Chips
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -626,7 +742,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 val isSelected = selectedZikir == zikir
                 FilterChip(
                     selected = isSelected,
-                    onClick = { selectedZikir = zikir },
+                    onClick = { viewModel.setTasbihZikir(zikir) },
                     label = { Text(zikir, fontSize = 11.5.sp) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = AmberAccent,
@@ -637,62 +753,210 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             }
         }
 
-        Spacer(Modifier.height(36.dp))
+        Spacer(Modifier.height(10.dp))
 
-        // Big Tactile Ring Button
-        GlassCard(
-            shape = CircleShape,
-            containerColor = SurfaceCard,
-            borderColor = AmberAccent.copy(alpha = 0.50f),
-            borderWidth = 2.dp,
-            modifier = Modifier
-                .size(240.dp)
-                .clickable { viewModel.incrementTasbih() }
+        // Target Selector Chips
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Box(
+            Text("Target:", color = TextSecondary, fontSize = 12.sp, modifier = Modifier.padding(end = 4.dp))
+            listOf(33, 99, 1000, 0).forEach { targetValue ->
+                val isSelected = currentTarget == targetValue
+                val label = if (targetValue == 0) "Bebas" else "$targetValue"
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = if (isSelected) AmberAccent else SurfaceCard,
                     modifier = Modifier
-                        .size(54.dp)
-                        .clip(CircleShape)
-                        .background(CatTasbih.copy(alpha = 0.20f)),
-                    contentAlignment = Alignment.Center
+                        .clickable { viewModel.setTasbihTarget(targetValue) }
+                        .padding(vertical = 2.dp)
                 ) {
-                    Icon(
-                        Icons.Default.TouchApp,
-                        contentDescription = null,
-                        tint = CatTasbih,
-                        modifier = Modifier.size(32.dp)
+                    Text(
+                        text = label,
+                        color = if (isSelected) Color.Black else TextPrimary,
+                        fontSize = 12.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
                     )
                 }
-                Spacer(Modifier.height(14.dp))
-                Text(
-                    text = "${state.preferences.tasbih}",
-                    fontSize = 58.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = AmberAccent
-                )
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    text = selectedZikir,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary
-                )
             }
         }
 
         Spacer(Modifier.height(28.dp))
 
+        // Speedometer Arc Gauge with Big Tappable Area
+        Box(
+            modifier = Modifier
+                .size(260.dp)
+                .clickable {
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    val reached = viewModel.incrementTasbih(selectedZikir)
+                    if (reached) {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Speedometer Arc Canvas
+            val progressFraction = if (currentTarget > 0) {
+                (currentCount.toFloat() / currentTarget).coerceIn(0f, 1f)
+            } else 1f
+            val animatedSweep by animateFloatAsState(
+                targetValue = progressFraction * 240f,
+                animationSpec = tween(150),
+                label = "gaugeSweep"
+            )
+
+            Canvas(modifier = Modifier.fillMaxSize().padding(14.dp)) {
+                val strokeWidth = 16.dp.toPx()
+                val diameter = size.minDimension - strokeWidth
+                val topLeft = Offset((size.width - diameter) / 2, (size.height - diameter) / 2)
+                val arcSize = Size(diameter, diameter)
+
+                // Background track arc (240 degrees from 150° to 390°)
+                drawArc(
+                    color = Color(0x24FFFFFF),
+                    startAngle = 150f,
+                    sweepAngle = 240f,
+                    useCenter = false,
+                    topLeft = topLeft,
+                    size = arcSize,
+                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                )
+
+                // Active progress arc
+                if (animatedSweep > 0f) {
+                    drawArc(
+                        color = AmberAccent,
+                        startAngle = 150f,
+                        sweepAngle = animatedSweep,
+                        useCenter = false,
+                        topLeft = topLeft,
+                        size = arcSize,
+                        style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                    )
+                }
+            }
+
+            // Central Counter and Zikir Information
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "$currentCount",
+                    fontSize = 58.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AmberAccent
+                )
+                Text(
+                    text = if (currentTarget > 0) "Target: $currentTarget" else "Target: Bebas",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = selectedZikir,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary
+                )
+            }
+        }
+
+        Spacer(Modifier.height(18.dp))
+
+        // Reset Counter Button
         OutlinedButton(
-            onClick = viewModel::resetTasbih,
-            shape = RoundedCornerShape(20.dp)
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                viewModel.resetTasbih()
+            },
+            shape = RoundedCornerShape(16.dp)
         ) {
             Icon(Icons.Default.Refresh, contentDescription = null, tint = AmberAccent)
             Spacer(Modifier.width(6.dp))
             Text("Reset Hitungan", color = AmberAccent)
+        }
+
+        Spacer(Modifier.height(26.dp))
+
+        // Zikir History Section
+        val historyList = state.preferences.tasbihHistory
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(Modifier.padding(18.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Riwayat Zikir",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    if (historyList.isNotEmpty()) {
+                        TextButton(onClick = viewModel::clearTasbihHistory) {
+                            Text("Hapus Riwayat", color = Color(0xFFFF6B6B), fontSize = 12.sp)
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(8.dp))
+
+                if (historyList.isEmpty()) {
+                    Text(
+                        text = "Belum ada riwayat zikir terselesaikan. Setiap target tercapai, riwayat akan otomatis tersimpan di sini.",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        historyList.forEach { history ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column {
+                                    Text(
+                                        text = history.zikir,
+                                        color = TextPrimary,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    Text(
+                                        text = history.date,
+                                        color = TextSecondary,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                }
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = AmberAccent.copy(alpha = 0.16f)
+                                ) {
+                                    Text(
+                                        text = "${history.count}x Selesai",
+                                        color = AmberAccent,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 11.sp,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                            HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
         }
     }
 }

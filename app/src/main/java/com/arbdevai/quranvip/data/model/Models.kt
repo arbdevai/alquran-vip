@@ -74,6 +74,8 @@ data class CalendarDate(
 data class Bookmark(val surah: Int, val ayah: Int, val name: String, val arabic: String, val translation: String)
 @Serializable
 data class ReadingPosition(val surah: Int, val ayah: Int, val name: String)
+@Serializable
+data class TasbihHistory(val id: Long, val zikir: String, val count: Int, val date: String)
 
 @Serializable
 data class UserPreferences(
@@ -85,5 +87,7 @@ data class UserPreferences(
     val zone: String = "Asia/Jakarta",
     val lastRead: ReadingPosition? = null,
     val bookmarks: List<Bookmark> = emptyList(),
-    val tasbih: Int = 0
+    val tasbih: Int = 0,
+    val tasbihTarget: Int = 33,
+    val tasbihHistory: List<TasbihHistory> = emptyList()
 )

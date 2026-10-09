@@ -55,7 +55,8 @@ data class UiState(
     val calendarError: String? = null,
     val locationLoading: Boolean = false,
     val locationError: String? = null,
-    val playback: PlaybackState = PlaybackState()
+    val playback: PlaybackState = PlaybackState(),
+    val tasbihZikir: String = "Subhanallah"
 ) {
     val filteredSurahs: List<Surah>
         get() = surahs.filter {
@@ -301,8 +302,40 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
                 .onFailure { if (token == calendarRequest) _state.update { state -> state.copy(calendarLoading = false, calendarError = "Kalender Hijriah gagal dimuat.") } }
         }
     }
-    fun incrementTasbih() = persist { app.preferences.incrementTasbih() }
+    fun incrementTasbih(zikirName: String = "Subhanallah"): Boolean {
+        val prefs = _state.value.preferences
+        val current = prefs.tasbih
+        val target = prefs.tasbihTarget
+        if (target > 0 && current + 1 >= target) {
+            val history = TasbihHistory(
+                id = System.currentTimeMillis(),
+                zikir = zikirName,
+                count = target,
+                date = LocalDate.now().toString()
+            )
+            persist {
+                app.preferences.addTasbihHistory(history)
+                app.preferences.resetTasbih()
+            }
+            return true
+        } else {
+            persist { app.preferences.incrementTasbih() }
+            return false
+        }
+    }
     fun resetTasbih() = persist { app.preferences.resetTasbih() }
+    fun setTasbihTarget(target: Int) = persist { app.preferences.setTasbihTarget(target) }
+    fun clearTasbihHistory() = persist { app.preferences.clearTasbihHistory() }
+
+    fun setTasbihZikir(name: String) = _state.update { it.copy(tasbihZikir = name) }
+    fun handleVolumeKeyAsTasbih(): Boolean {
+        if (_state.value.screen == AppScreen.TASBIH) {
+            incrementTasbih(_state.value.tasbihZikir)
+            return true
+        }
+        return false
+    }
+
     private fun safeZone(value: String) = runCatching { ZoneId.of(value) }.getOrDefault(ZoneId.of(DEFAULT_ZONE))
     override fun onCleared() { playbackController.close(); super.onCleared() }
 }
