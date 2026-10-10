@@ -30,7 +30,7 @@ fun QuranHeroBanner(
     subtitle: String,
     tag: String? = null,
     arabicWatermark: String = "۞",
-    arabicQuote: String? = null,
+    arabicQuote: Triple<String, String, String>? = null,
     badges: List<String> = emptyList(),
     gradientColors: List<Color> = listOf(EmeraldGradientStart, EmeraldGradientMid, EmeraldGradientEnd),
     trailingContent: @Composable (RowScope.() -> Unit)? = null,
@@ -152,8 +152,8 @@ fun QuranHeroBanner(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = arabicQuote,
-                    color = AmberAccent,
+                    text = arabicQuote.first,
+                    color = Color.White,
                     textAlign = TextAlign.End,
                     style = TextStyle(
                         fontFamily = ArabicFontFamily,
@@ -162,6 +162,28 @@ fun QuranHeroBanner(
                         lineHeightStyle = ArabicLineHeightStyle,
                         textDirection = TextDirection.Rtl,
                         platformStyle = PlatformTextStyle(includeFontPadding = false)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = arabicQuote.second,
+                    color = Color.White.copy(alpha = 0.9f),
+                    textAlign = TextAlign.End,
+                    style = TextStyle(
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                        fontSize = 14.sp
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = arabicQuote.third,
+                    color = Color.White.copy(alpha = 0.7f),
+                    textAlign = TextAlign.End,
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
