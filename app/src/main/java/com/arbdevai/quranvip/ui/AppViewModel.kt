@@ -240,6 +240,7 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
     fun setQori(id: String) = persist { app.preferences.setQori(id) }
     fun setFontSize(size: Int) = persist { app.preferences.setFontSize(size) }
     fun toggleLatin() = persist { app.preferences.toggleLatin() }
+    fun toggleDarkMode() = persist { app.preferences.toggleDarkMode() }
     fun toggleTranslation() = persist { app.preferences.toggleTranslation() }
 
     fun setCityQuery(query: String) {

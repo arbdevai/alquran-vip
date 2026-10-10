@@ -21,9 +21,13 @@ class MainActivity : ComponentActivity() {
         appViewModel = ViewModelProvider(this)[AppViewModel::class.java]
 
         setContent {
-            QuranVipTheme {
-                val state by appViewModel.state.collectAsStateWithLifecycle()
-                QuranApp(state = state, viewModel = appViewModel)
+            val state by appViewModel.state.collectAsStateWithLifecycle()
+            androidx.compose.runtime.CompositionLocalProvider(
+                com.arbdevai.quranvip.ui.theme.LocalThemeIsDark provides state.preferences.isDarkMode
+            ) {
+                QuranVipTheme {
+                    QuranApp(state = state, viewModel = appViewModel)
+                }
             }
         }
     }

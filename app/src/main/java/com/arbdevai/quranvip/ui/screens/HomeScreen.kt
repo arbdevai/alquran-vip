@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -88,15 +91,27 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                 arabicQuote = randomQuote,
                 badges = listOf(cityText, hijriText),
                 trailingContent = {
-                    FilledIconButton(
-                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = Color.Black.copy(alpha = 0.35f),
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilledIconButton(
+                            onClick = { viewModel.toggleDarkMode() },
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = Color.Black.copy(alpha = 0.35f),
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(if (state.preferences.isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode, contentDescription = "Mode Gelap")
+                        }
+                        FilledIconButton(
+                            onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = Color.Black.copy(alpha = 0.35f),
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                        }
                     }
                 }
             )

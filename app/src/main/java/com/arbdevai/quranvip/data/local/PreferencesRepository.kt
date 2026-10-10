@@ -26,6 +26,7 @@ class PreferencesRepository(private val context: Context) {
         val TASBIH = intPreferencesKey("tasbih")
         val TASBIH_TARGET = intPreferencesKey("tasbih_target")
         val TASBIH_HISTORY = stringPreferencesKey("tasbih_history")
+        val IS_DARK_MODE = booleanPreferencesKey("is_dark_mode")
     }
 
     val stream: Flow<UserPreferences> = context.dataStore.data.map { prefs ->
@@ -44,7 +45,8 @@ class PreferencesRepository(private val context: Context) {
             bookmarks = bookmarks,
             tasbih = prefs[Keys.TASBIH] ?: 0,
             tasbihTarget = prefs[Keys.TASBIH_TARGET] ?: 33,
-            tasbihHistory = history
+            tasbihHistory = history,
+            isDarkMode = prefs[Keys.IS_DARK_MODE] ?: false
         )
     }
 
@@ -75,4 +77,5 @@ class PreferencesRepository(private val context: Context) {
         prefs[Keys.TASBIH_HISTORY] = json.encodeToString(updated)
     }
     suspend fun clearTasbihHistory() = context.dataStore.edit { it.remove(Keys.TASBIH_HISTORY) }
+    suspend fun toggleDarkMode() = context.dataStore.edit { it[Keys.IS_DARK_MODE] = !(it[Keys.IS_DARK_MODE] ?: false) }
 }

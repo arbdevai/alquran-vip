@@ -89,7 +89,8 @@ data class UserPreferences(
     val bookmarks: List<Bookmark> = emptyList(),
     val tasbih: Int = 0,
     val tasbihTarget: Int = 33,
-    val tasbihHistory: List<TasbihHistory> = emptyList()
+    val tasbihHistory: List<TasbihHistory> = emptyList(),
+    val isDarkMode: Boolean = false
 )
 
 @Serializable
