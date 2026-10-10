@@ -3,60 +3,59 @@ package com.arbdevai.quranvip.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ==========================================
-// 1. Root Canvas & Bento Grid Surfaces (Desert Sand)
+// 1. Root Canvas & Bento Grid Surfaces (Fresh White & Blue)
 // ==========================================
-val BgCanvas = Color(0xFFF8F5F0)             // Desert Sand Background (Warm & easy on eyes)
+val BgCanvas = Color(0xFFF5F9FF)             // Very light cool blue background (Fresh)
 val SurfaceCard = Color(0xFFFFFFFF)          // Pure White Bento Boxes
 val SurfaceRaised = Color(0xFFFFFFFF)        // Dialogs
-val SurfaceInput = Color(0xFFF0ECE4)         // Search bar & inputs
-val SurfacePill = Color(0xFFEBE6DD)          // Pills & chips
-val BorderSubtle = Color(0xFFE5DFD5)         // Clean subtle border for Bento Grid
+val SurfaceInput = Color(0xFFEAF1FA)         // Search bar & inputs
+val SurfacePill = Color(0xFFE0EDF8)          // Pills & chips
+val BorderSubtle = Color(0xFFD6E4F0)         // Clean subtle border for Bento Grid
 
 // ==========================================
-// 2. Copper & Emerald Identity
+// 2. Fresh Blue Identity
 // ==========================================
-// Primary Accent: Warm Copper
-val AmberAccent = Color(0xFFC67C4E)          // Copper Accent (replaces Amber)
-val AmberPressed = Color(0xFFA6643B)         // Copper Pressed
-val AmberSoft = Color(0x26C67C4E)            // Copper background wash
+// Primary Accent: Fresh Blue
+val AmberAccent = Color(0xFF2563EB)          // Royal Blue Accent (kept variable name AmberAccent for compatibility)
+val AmberPressed = Color(0xFF1D4ED8)         // Darker Blue Pressed
+val AmberSoft = Color(0x262563EB)            // Light blue background wash
 
-// Hero Banner Gradient (Optional use for Hero Cards)
-val EmeraldGradientStart = Color(0xFFDCA983) // Soft Copper
-val EmeraldGradientMid = Color(0xFFC67C4E)   // Base Copper
-val EmeraldGradientEnd = Color(0xFFB0643A)   // Deep Copper
+// Hero Banner Gradient (Fresh Blue Gradient)
+val EmeraldGradientStart = Color(0xFF60A5FA) // Light Blue
+val EmeraldGradientMid = Color(0xFF3B82F6)   // Medium Blue
+val EmeraldGradientEnd = Color(0xFF2563EB)   // Deep Blue
 
 // ==========================================
 // 3. Typographic Text Hierarchy
 // ==========================================
-val TextPrimary = Color(0xFF2D2A26)          // Espresso Dark for primary text
-val TextTransliteration = Color(0xFFC67C4E)  // Copper for transliteration
-val TextTranslation = Color(0xFF5A554E)      // Medium warm gray for translation
-val TextSecondary = Color(0xFF8A857C)        // Light warm gray for captions
-val TextPlaceholder = Color(0xFFA19C92)      // Search hints
+val TextPrimary = Color(0xFF1E293B)          // Dark Slate for primary text
+val TextTransliteration = Color(0xFF2563EB)  // Blue for transliteration
+val TextTranslation = Color(0xFF475569)      // Slate gray for translation
+val TextSecondary = Color(0xFF64748B)        // Light slate gray for captions
+val TextPlaceholder = Color(0xFF94A3B8)      // Search hints
 
 // ==========================================
 // 4. Feature Tile / Bento Icon Colors
 // ==========================================
-// In Bento Grid, we avoid gradients and use solid, soft elegant colors
-val TileQuranStart = Color(0xFF507871)       // Deep Muted Emerald
-val TileQuranEnd = Color(0xFF507871)
+val TileQuranStart = Color(0xFF3B82F6)       // Solid Blue
+val TileQuranEnd = Color(0xFF3B82F6)
 
-val TileJadwalStart = Color(0xFFB28C5E)      // Desert Gold
-val TileJadwalEnd = Color(0xFFB28C5E)
+val TileJadwalStart = Color(0xFF0EA5E9)      // Sky Blue
+val TileJadwalEnd = Color(0xFF0EA5E9)
 
-val TileTasbihStart = Color(0xFFC67C4E)      // Copper
-val TileTasbihEnd = Color(0xFFC67C4E)
+val TileTasbihStart = Color(0xFF8B5CF6)      // Violet/Purple Accent
+val TileTasbihEnd = Color(0xFF8B5CF6)
 
-val TileBookmarkStart = Color(0xFF886358)    // Warm Terracotta
-val TileBookmarkEnd = Color(0xFF886358)
+val TileBookmarkStart = Color(0xFFF59E0B)    // Amber for Bookmark
+val TileBookmarkEnd = Color(0xFFF59E0B)
 
-val TileSettingsStart = Color(0xFF5B6973)    // Slate Blue-Gray
-val TileSettingsEnd = Color(0xFF5B6973)
+val TileSettingsStart = Color(0xFF64748B)    // Slate
+val TileSettingsEnd = Color(0xFF64748B)
 
-val CatJadwal = Color(0xFFB28C5E)
+val CatJadwal = Color(0xFF0EA5E9)
 
 // ==========================================
-// 5. Solid / Flat Fallbacks (Removing Glassmorphism)
+// 5. Solid / Flat Fallbacks (Bento Style)
 // ==========================================
 val GlassBackground = SurfaceCard
 val GlassSurface = SurfaceCard
@@ -64,4 +63,4 @@ val GlassNavbar = Color(0xFFFFFFFF)           // Solid white navbar
 val GlassBorder = BorderSubtle
 val GlassBorderGlow = AmberAccent
 val GlassHighlight = Color.Transparent
-val GlassCardPressed = Color(0xFFF7F4F0)
+val GlassCardPressed = Color(0xFFF0F6FF)      // Light blue tint on press
