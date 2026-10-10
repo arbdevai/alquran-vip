@@ -1,5 +1,6 @@
 package com.arbdevai.quranvip.ui.components
 
+import androidx.compose.ui.composed
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -254,10 +255,12 @@ fun CalmTimeBlock(
 
 fun Modifier.tonalCard(
     shape: Shape = RoundedCornerShape(18.dp)
-): Modifier = this
-    .clip(shape)
-    .background(SurfaceCard)
-    .border(0.5.dp, BorderSubtle, shape)
+): Modifier = composed {
+    this
+        .clip(shape)
+        .background(SurfaceCard)
+        .border(0.5.dp, BorderSubtle, shape)
+}
 
 fun RowScope.ayahGlyph(
     text: String,

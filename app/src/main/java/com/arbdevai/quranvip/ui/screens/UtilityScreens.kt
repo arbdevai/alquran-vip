@@ -854,6 +854,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 label = "gaugeSweep"
             )
 
+            val activeArcColor = AmberAccent
             Canvas(modifier = Modifier.fillMaxSize().padding(14.dp)) {
                 val strokeWidth = 16.dp.toPx()
                 val diameter = size.minDimension - strokeWidth
@@ -874,7 +875,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 // Active progress arc
                 if (animatedSweep > 0f) {
                     drawArc(
-                        color = AmberAccent,
+                        color = activeArcColor,
                         startAngle = 150f,
                         sweepAngle = animatedSweep,
                         useCenter = false,

@@ -1,5 +1,6 @@
 package com.arbdevai.quranvip.ui.theme
 
+import androidx.compose.runtime.Composable
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -29,7 +30,7 @@ val ArabicLineHeightStyle = LineHeightStyle(
     trim = LineHeightStyle.Trim.None
 )
 
-val QuranTypography = Typography(
+val QuranTypography: Typography @Composable get() = Typography(
     displayLarge = TextStyle(
         fontFamily = ArabicFontFamily,
         fontWeight = FontWeight.Normal,
