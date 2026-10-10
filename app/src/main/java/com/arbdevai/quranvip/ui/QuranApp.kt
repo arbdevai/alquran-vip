@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import com.arbdevai.quranvip.ui.screens.*
 import com.arbdevai.quranvip.ui.theme.*
 
+
 @Composable
 fun QuranApp(state: UiState, viewModel: AppViewModel) {
     // Auto-prompt GPS permission on first launch for accurate prayer times
@@ -103,7 +104,8 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
     }
 }
 
-@Composable
+
+
 @Composable
 private fun FloatingIslandNavbar(
     currentScreen: AppScreen,
