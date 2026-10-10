@@ -111,7 +111,7 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
         checkForUpdate()
     }
     
-    private fun checkForUpdate() {
+    fun checkForUpdate() {
         viewModelScope.launch {
             try {
                 val release = com.arbdevai.quranvip.data.remote.NetworkModule.github.getLatestRelease()

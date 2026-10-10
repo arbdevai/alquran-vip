@@ -28,6 +28,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::appViewModel.isInitialized) {
+            appViewModel.checkForUpdate()
+        }
+    }
+
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         if (::appViewModel.isInitialized && event.action == KeyEvent.ACTION_DOWN) {
             when (event.keyCode) {

@@ -13,6 +13,11 @@ import java.io.File
 
 object ApkUpdater {
     fun downloadAndInstall(context: Context, url: String, version: String) {
+        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "alquran-vip-update.apk")
+        if (file.exists()) {
+            file.delete()
+        }
+
         val request = DownloadManager.Request(Uri.parse(url)).apply {
             setTitle("Mengunduh Al-Quran VIP $version")
             setDescription("Tunggu sebentar, update sedang diunduh...")
