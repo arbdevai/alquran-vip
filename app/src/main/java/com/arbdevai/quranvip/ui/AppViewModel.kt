@@ -57,7 +57,8 @@ data class UiState(
     val locationError: String? = null,
     val playback: PlaybackState = PlaybackState(),
     val tasbihZikir: String = "Subhanallah",
-    val latestUpdate: GithubRelease? = null
+    val latestUpdate: GithubRelease? = null,
+    val githubRelease: GithubRelease? = null
 ) {
     val filteredSurahs: List<Surah>
         get() = surahs.filter {
@@ -131,7 +132,9 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
                 val currentVersion = "v${com.arbdevai.quranvip.BuildConfig.VERSION_NAME}"
                 
                 if (isNewerVersion(currentVersion, release.tag_name)) {
-                    _state.update { it.copy(latestUpdate = release) }
+                    _state.update { it.copy(latestUpdate = release, githubRelease = release) }
+                } else {
+                    _state.update { it.copy(githubRelease = release) }
                 }
             } catch (e: Exception) {
                 // Ignore update check failure

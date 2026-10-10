@@ -33,6 +33,7 @@ import com.arbdevai.quranvip.ui.theme.BorderSubtle
 import com.arbdevai.quranvip.ui.theme.SurfaceCard
 import com.arbdevai.quranvip.ui.theme.TextPrimary
 import com.arbdevai.quranvip.ui.theme.TextSecondary
+import com.arbdevai.quranvip.ui.theme.BgCanvas
 
 @Composable
 fun CalmScreenTitle(
@@ -200,7 +201,7 @@ fun CalmChip(
     modifier: Modifier = Modifier
 ) {
     val background = if (selected) TextPrimary else Color.Transparent
-    val contentColor = if (selected) Color(0xFF0B0C0E) else TextSecondary
+    val contentColor = if (selected) BgCanvas else TextSecondary
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))

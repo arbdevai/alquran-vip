@@ -122,9 +122,9 @@ private fun FloatingIslandNavbar(
         Surface(
             modifier = Modifier.padding(horizontal = 24.dp),
             shape = RoundedCornerShape(32.dp),
-            color = Color(0xFFFAFAFA).copy(alpha = 0.95f),
+            color = GlassNavbar.copy(alpha = 0.95f),
             shadowElevation = 12.dp,
-            border = BorderStroke(1.dp, Color(0xFFE5E7EB))
+            border = BorderStroke(1.dp, GlassBorder)
         ) {
             Row(
                 modifier = Modifier
@@ -143,8 +143,8 @@ private fun FloatingIslandNavbar(
 
                 navItems.forEach { (screen, icon) ->
                     val selected = currentScreen == screen
-                    val tint by animateColorAsState(if (selected) Color(0xFF0F172A) else Color(0xFF94A3B8), label = "tint")
-                    val bgAlpha by animateFloatAsState(if (selected) 0.1f else 0f, label = "bg")
+                    val tint by animateColorAsState(if (selected) TextPrimary else TextSecondary, label = "tint")
+                    val bgAlpha by animateFloatAsState(if (selected) 1f else 0f, label = "bg")
                     
                     Box(
                         modifier = Modifier
@@ -161,7 +161,7 @@ private fun FloatingIslandNavbar(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(Color(0xFF0F172A).copy(alpha = bgAlpha)),
+                                .background(if (selected) AmberSoft else Color.Transparent),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(24.dp))

@@ -47,6 +47,7 @@ import com.arbdevai.quranvip.ui.AppScreen
 import com.arbdevai.quranvip.ui.AppViewModel
 import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.GlassCard
+import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 import com.arbdevai.quranvip.util.CalendarHelper
 import java.time.LocalDate
@@ -71,32 +72,16 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .verticalScroll(rememberScrollState())
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        // Clean Header (Title + Location actions)
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Jadwal Salat",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                val cityText = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS"
-                Text(
-                    text = cityText,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AmberAccent
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        QuranHeroBanner(
+            title = "Jadwal Salat",
+            subtitle = state.preferences.city?.let { "${it.lokasi} (${state.preferences.zone})" } ?: "Lokasi GPS",
+            tag = "PRAYER",
+            trailingContent = {
                 FilledIconButton(
                     onClick = { cityDialog = true },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = SurfaceCard,
-                        contentColor = TextPrimary
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
                     ),
                     modifier = Modifier.size(40.dp)
                 ) {
@@ -112,15 +97,16 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                         )
                     },
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = SurfaceCard,
-                        contentColor = AmberAccent
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
                     ),
                     modifier = Modifier.size(40.dp)
                 ) {
                     Icon(Icons.Default.MyLocation, contentDescription = "GPS Otomatis")
                 }
-            }
-        }
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         if (state.locationLoading) {
             Spacer(Modifier.height(10.dp))
@@ -163,6 +149,7 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 ErrorView(state.prayerError, viewModel::retryPrayer)
             }
             day != null -> {
+                NextPrayerCountdownCard(day, modifier = Modifier.padding(bottom = 16.dp))
                 GlassCard(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(22.dp)
@@ -272,29 +259,24 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             .verticalScroll(rememberScrollState())
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        // Clean Header (Title + Hijri Info)
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Kalender 4-in-1",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Nasional · Hijriyah (Arab/Latin) · Pasaran Jawa",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AmberAccent
-                )
-            }
-            IconButton(onClick = { showDatePicker = true }) {
-                Icon(Icons.Default.Search, contentDescription = "Cari Tanggal", tint = TextPrimary)
-            }
-        }
+        QuranHeroBanner(
+            title = "Kalender 4-in-1",
+            subtitle = "Nasional · Hijriyah (Arab/Latin) · Pasaran Jawa",
+            tag = "CALENDAR",
+            trailingContent = {
+                FilledIconButton(
+                    onClick = { showDatePicker = true },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = "Cari Tanggal")
+                }
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         Spacer(Modifier.height(16.dp))
 
@@ -459,10 +441,10 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
 
                                 // Top-Right: Pasaran Jawa
                                 Text(
-                                    text = triple.pasaran,
-                                    fontSize = 8.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = if (isSelected) AmberAccent else TextSecondary,
+                                    text = triple.pasaran.take(3),
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) AmberAccent else TextPrimary.copy(alpha = 0.9f),
                                     modifier = Modifier.align(Alignment.TopEnd)
                                 )
 
@@ -592,11 +574,10 @@ fun BookmarksScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier 
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         item {
-            Text(
-                text = "Ayat Disimpan",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary,
+            QuranHeroBanner(
+                title = "Ayat Disimpan",
+                subtitle = "${state.preferences.bookmarks.size} Ayat tersimpan",
+                tag = "BOOKMARKS",
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }
@@ -744,38 +725,26 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Screen Header
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Column {
-                Text(
-                    text = "Tasbih Digital",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-                Text(
-                    text = "Tombol Volume HP (+/-) Aktif",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AmberAccent
-                )
-            }
-            FilledTonalButton(
-                onClick = { isPocketLockActive = true },
-                shape = RoundedCornerShape(14.dp),
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = SurfaceCard,
-                    contentColor = TextPrimary
-                )
-            ) {
-                Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("Kunci Layar", fontSize = 12.sp)
-            }
-        }
+        QuranHeroBanner(
+            title = "Tasbih Digital",
+            subtitle = "Tombol Volume HP (+/-) Aktif",
+            tag = "TASBIH",
+            trailingContent = {
+                FilledTonalButton(
+                    onClick = { isPocketLockActive = true },
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    )
+                ) {
+                    Icon(Icons.Default.Lock, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("Kunci Layar", fontSize = 12.sp)
+                }
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
 
         Spacer(Modifier.height(14.dp))
 
@@ -1019,11 +988,10 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             .verticalScroll(rememberScrollState())
             .padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp)
     ) {
-        Text(
-            text = "Pengaturan",
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = TextPrimary,
+        QuranHeroBanner(
+            title = "Pengaturan",
+            subtitle = "Kustomisasi aplikasi",
+            tag = "SETTINGS",
             modifier = Modifier.padding(vertical = 4.dp)
         )
 
@@ -1111,7 +1079,7 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         GlassCard(
             modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
             shape = RoundedCornerShape(16.dp),
-            onClick = { if (state.latestUpdate != null) showChangelog = true }
+            onClick = { if (state.githubRelease != null) showChangelog = true }
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
@@ -1121,7 +1089,7 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
                     Text("Al-Quran VIP", color = TextPrimary, fontWeight = FontWeight.Bold)
                     Text("Versi ${com.arbdevai.quranvip.BuildConfig.VERSION_NAME}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
                 }
-                if (state.latestUpdate != null) {
+                if (state.githubRelease != null) {
                     TextButton(onClick = { showChangelog = true }) {
                         Text("Lihat Changelog", color = AmberAccent, fontWeight = FontWeight.Bold)
                     }
@@ -1129,8 +1097,8 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             }
         }
         
-        if (showChangelog && state.latestUpdate != null) {
-            val update = state.latestUpdate
+        if (showChangelog && state.githubRelease != null) {
+            val update = state.githubRelease
             AlertDialog(
                 onDismissRequest = { showChangelog = false },
                 title = { Text("Changelog ${update.tag_name}", color = AmberAccent, fontWeight = FontWeight.Bold) },
