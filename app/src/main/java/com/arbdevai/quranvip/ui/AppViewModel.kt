@@ -140,7 +140,11 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
     fun clearMessage() = _state.update { it.copy(message = null) }
     fun setScreen(screen: AppScreen) {
         savedState["screen"] = screen.name
-        _state.update { it.copy(screen = screen) }
+        _state.update { it.copy(
+            screen = screen,
+            selectedPrayerDate = LocalDate.now(),
+            prayerMonth = YearMonth.now()
+        ) }
         if (screen == AppScreen.PRAYER || screen == AppScreen.CALENDAR) refreshPrayerForTodayIfNeeded()
     }
     fun setSurahQuery(query: String) = _state.update { it.copy(surahQuery = query) }

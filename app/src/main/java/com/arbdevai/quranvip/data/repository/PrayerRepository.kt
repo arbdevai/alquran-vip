@@ -23,7 +23,7 @@ class PrayerRepository(private val api: MuslimApi, private val cache: ResponseCa
 
     suspend fun getPrayerMonth(cityId: String, yearMonth: YearMonth, timeZone: String): PrayerData =
         cache.get("prayer_${cityId}_${yearMonth}_$timeZone", 86400000L) {
-            api.prayerPeriod(cityId, yearMonth.toString(), timeZone).requireData().also { data ->
+            api.prayerPeriod(cityId, yearMonth.year.toString(), String.format("%02d", yearMonth.monthValue), timeZone).requireData().also { data ->
                 require(data.id == cityId && data.jadwal.keys.any { it.startsWith(yearMonth.toString()) }) {
                     "Respons jadwal tidak sesuai kota atau bulan yang diminta"
                 }

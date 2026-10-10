@@ -47,8 +47,7 @@ fun QuranHeroBanner(
                     Brush.linearGradient(
                         listOf(
                             Color.White.copy(alpha = 0.40f),
-                            Color.White.copy(alpha = 0.08f),
-                            AmberAccent.copy(alpha = 0.45f)
+                            Color.White.copy(alpha = 0.15f)
                         )
                     )
                 ),

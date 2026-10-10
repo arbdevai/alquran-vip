@@ -26,9 +26,13 @@ interface MuslimApi {
     @GET("sholat/jadwal/{id}/today")
     suspend fun prayerToday(@Path("id") id: String, @Query("tz") timeZone: String): MuslimResponse<PrayerData>
 
-    @GET("sholat/jadwal/{id}/{period}")
-    suspend fun prayerPeriod(@Path("id") id: String, @Path("period") period: String,
-        @Query("tz") timeZone: String): MuslimResponse<PrayerData>
+    @GET("sholat/jadwal/{id}/{year}/{month}")
+    suspend fun prayerPeriod(
+        @Path("id") id: String,
+        @Path("year") year: String,
+        @Path("month") month: String,
+        @Query("tz") timeZone: String
+    ): MuslimResponse<PrayerData>
 
     @GET("cal/hijr/{date}")
     suspend fun calendar(@Path("date") date: String, @Query("tz") timeZone: String,

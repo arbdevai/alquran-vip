@@ -50,6 +50,8 @@ import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.theme.*
 import com.arbdevai.quranvip.util.CalendarHelper
 import java.time.LocalDate
+import java.time.Instant
+import java.time.ZoneOffset
 
 @Composable
 fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
@@ -235,8 +237,34 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = state.selectedPrayerDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+        )
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
+                        viewModel.selectPrayerDate(date)
+                    }
+                    showDatePicker = false
+                }) { Text("Pilih", color = AmberAccent) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Batal", color = TextSecondary) }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -252,16 +280,19 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         ) {
             Column {
                 Text(
-                    text = "Kalender 3-in-1",
+                    text = "Kalender 4-in-1",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = TextPrimary
                 )
                 Text(
-                    text = "Nasional · Hijriyah (Arab) · Pasaran Jawa",
+                    text = "Nasional · Hijriyah (Arab/Latin) · Pasaran Jawa",
                     style = MaterialTheme.typography.labelSmall,
                     color = AmberAccent
                 )
+            }
+            IconButton(onClick = { showDatePicker = true }) {
+                Icon(Icons.Default.Search, contentDescription = "Cari Tanggal", tint = TextPrimary)
             }
         }
 
@@ -388,6 +419,9 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                             val isSelected = date == state.selectedPrayerDate
                             val isToday = date == LocalDate.now()
 
+                            val isFriday = date.dayOfWeek.value == 5
+                            val isSunday = date.dayOfWeek.value == 7
+
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
@@ -396,14 +430,19 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(
                                         when {
-                                            isSelected -> AmberAccent.copy(alpha = 0.22f)
-                                            isToday -> Color.White.copy(alpha = 0.10f)
+                                            isSelected -> AmberAccent.copy(alpha = 0.4f)
+                                            isFriday -> Color(0xFF1B5E20).copy(alpha = 0.45f)
+                                            isSunday -> Color(0xFFB71C1C).copy(alpha = 0.45f)
                                             else -> SurfaceCard
                                         }
                                     )
                                     .border(
-                                        width = if (isSelected) 1.2.dp else 0.5.dp,
-                                        color = if (isSelected) AmberAccent else if (isToday) Color.White.copy(alpha = 0.4f) else BorderSubtle,
+                                        width = if (isSelected || isToday) 2.dp else 0.5.dp,
+                                        color = when {
+                                            isSelected -> AmberAccent
+                                            isToday -> Color.White
+                                            else -> BorderSubtle
+                                        },
                                         shape = RoundedCornerShape(10.dp)
                                     )
                                     .clickable { viewModel.setPrayerDate(date) }
