@@ -37,6 +37,7 @@ import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
 fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
