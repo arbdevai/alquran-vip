@@ -111,12 +111,26 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
         checkForUpdate()
     }
     
+    private fun isNewerVersion(current: String, release: String): Boolean {
+        val currParts = current.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
+        val relParts = release.removePrefix("v").split(".").map { it.toIntOrNull() ?: 0 }
+        val length = maxOf(currParts.size, relParts.size)
+        for (i in 0 until length) {
+            val c = currParts.getOrElse(i) { 0 }
+            val r = relParts.getOrElse(i) { 0 }
+            if (r > c) return true
+            if (r < c) return false
+        }
+        return false
+    }
+
     fun checkForUpdate() {
         viewModelScope.launch {
             try {
                 val release = com.arbdevai.quranvip.data.remote.NetworkModule.github.getLatestRelease()
                 val currentVersion = "v${com.arbdevai.quranvip.BuildConfig.VERSION_NAME}"
-                if (release.tag_name > currentVersion || (release.tag_name != currentVersion && !release.tag_name.contains("alpha"))) {
+                
+                if (isNewerVersion(currentVersion, release.tag_name)) {
                     _state.update { it.copy(latestUpdate = release) }
                 }
             } catch (e: Exception) {
