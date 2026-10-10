@@ -557,6 +557,8 @@ private fun TodayPrayerCard(
 @Composable
 fun UpdateBanner(update: com.arbdevai.quranvip.data.model.GithubRelease) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    var showChangelog by androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(false) }
+
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
         containerColor = Color(0xFF1E3A8A).copy(alpha = 0.1f),
@@ -572,22 +574,58 @@ fun UpdateBanner(update: com.arbdevai.quranvip.data.model.GithubRelease) {
             Spacer(Modifier.height(8.dp))
             Text(update.body.take(150) + if (update.body.length > 150) "..." else "", 
                 color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            
             Spacer(Modifier.height(12.dp))
             
-            val downloadUrl = update.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url 
-                ?: "https://github.com/arbdevai/alquran-vip/releases/latest"
-                
-            Button(
-                onClick = { 
-                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(downloadUrl))
-                    context.startActivity(intent)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6), contentColor = Color.White),
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Download & Install Update", fontWeight = FontWeight.Bold)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedButton(
+                    onClick = { showChangelog = true },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF93C5FD)),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.5f)),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Apa yang Baru?", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
+
+                val downloadUrl = update.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url 
+                    ?: "https://github.com/arbdevai/alquran-vip/releases/latest"
+                    
+                Button(
+                    onClick = { 
+                        if (downloadUrl.endsWith(".apk")) {
+                            com.arbdevai.quranvip.util.ApkUpdater.downloadAndInstall(context, downloadUrl, update.tag_name)
+                        } else {
+                            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(downloadUrl))
+                            context.startActivity(intent)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6), contentColor = Color.White),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Update", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
+    }
+
+    if (showChangelog) {
+        AlertDialog(
+            onDismissRequest = { showChangelog = false },
+            title = { Text("Changelog ${update.tag_name}", color = AmberAccent, fontWeight = FontWeight.Bold) },
+            text = {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                    item {
+                        Text(update.body, color = TextPrimary, style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showChangelog = false }) { Text("Tutup", color = AmberAccent) }
+            },
+            containerColor = SurfaceCard,
+            shape = RoundedCornerShape(16.dp)
+        )
     }
 }
