@@ -41,6 +41,13 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // 0. Update Banner
+        state.latestUpdate?.let { update ->
+            item {
+                UpdateBanner(update = update)
+            }
+        }
+
         // 1. Signature Emerald Hero Banner (Yasin Inspiration)
         item {
             val hijriText = state.selectedCalendar?.hijr?.let {
@@ -542,6 +549,44 @@ private fun TodayPrayerCard(
                         modifier = Modifier.padding(14.dp)
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun UpdateBanner(update: com.arbdevai.quranvip.data.model.GithubRelease) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    GlassCard(
+        modifier = Modifier.fillMaxWidth(),
+        containerColor = Color(0xFF1E3A8A).copy(alpha = 0.1f),
+        borderColor = Color(0xFF3B82F6).copy(alpha = 0.5f)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.SystemUpdate, contentDescription = null, tint = Color(0xFF60A5FA))
+                Spacer(Modifier.width(8.dp))
+                Text("Pembaruan Tersedia: ${update.name.ifBlank { update.tag_name }}", 
+                    color = Color(0xFF93C5FD), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(update.body.take(150) + if (update.body.length > 150) "..." else "", 
+                color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(12.dp))
+            
+            val downloadUrl = update.assets.firstOrNull { it.name.endsWith(".apk") }?.browser_download_url 
+                ?: "https://github.com/arbdevai/alquran-vip/releases/latest"
+                
+            Button(
+                onClick = { 
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(downloadUrl))
+                    context.startActivity(intent)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6), contentColor = Color.White),
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Download & Install Update", fontWeight = FontWeight.Bold)
             }
         }
     }

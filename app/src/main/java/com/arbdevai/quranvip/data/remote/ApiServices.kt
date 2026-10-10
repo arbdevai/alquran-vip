@@ -37,3 +37,8 @@ interface MuslimApi {
     @GET("cal/today")
     suspend fun calendarToday(@Query("tz") timeZone: String, @Query("method") method: String = "standar"): MuslimResponse<CalendarData>
 }
+
+interface GithubApi {
+    @GET("repos/arbdevai/alquran-vip/releases/latest")
+    suspend fun getLatestRelease(): GithubRelease
+}

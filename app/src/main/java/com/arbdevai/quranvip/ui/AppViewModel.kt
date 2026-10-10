@@ -56,7 +56,8 @@ data class UiState(
     val locationLoading: Boolean = false,
     val locationError: String? = null,
     val playback: PlaybackState = PlaybackState(),
-    val tasbihZikir: String = "Subhanallah"
+    val tasbihZikir: String = "Subhanallah",
+    val latestUpdate: GithubRelease? = null
 ) {
     val filteredSurahs: List<Surah>
         get() = surahs.filter {
@@ -107,6 +108,21 @@ class AppViewModel(application: Application, private val savedState: SavedStateH
         }
         loadSurahs()
         savedState.get<Int>("reader")?.let { openSurah(it, savedState.get<Int>("ayah") ?: 1) }
+        checkForUpdate()
+    }
+    
+    private fun checkForUpdate() {
+        viewModelScope.launch {
+            try {
+                val release = com.arbdevai.quranvip.data.remote.NetworkModule.github.getLatestRelease()
+                val currentVersion = "v${com.arbdevai.quranvip.BuildConfig.VERSION_NAME}"
+                if (release.tag_name > currentVersion || (release.tag_name != currentVersion && !release.tag_name.contains("alpha"))) {
+                    _state.update { it.copy(latestUpdate = release) }
+                }
+            } catch (e: Exception) {
+                // Ignore update check failure
+            }
+        }
     }
 
     // All requests preserve structured cancellation instead of swallowing cancellation as an error.

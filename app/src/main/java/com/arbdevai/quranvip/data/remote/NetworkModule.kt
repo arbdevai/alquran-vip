@@ -24,4 +24,5 @@ object NetworkModule {
 
     val quran: EQuranApi by lazy { retrofit("https://equran.id/").create(EQuranApi::class.java) }
     val muslim: MuslimApi by lazy { retrofit("https://api.myquran.com/v3/").create(MuslimApi::class.java) }
+    val github: GithubApi by lazy { retrofit("https://api.github.com/").create(GithubApi::class.java) }
 }

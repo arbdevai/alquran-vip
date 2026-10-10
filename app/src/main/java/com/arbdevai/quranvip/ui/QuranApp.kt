@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
@@ -181,12 +182,16 @@ private fun IslandNavItem(
                 modifier = Modifier.size(20.dp)
             )
         }
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-            text = label,
-            color = tint,
-            fontSize = 10.5.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
-        )
+        AnimatedVisibility(visible = selected) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = label,
+                    color = tint,
+                    fontSize = 10.5.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
     }
 }

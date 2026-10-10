@@ -409,16 +409,16 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                     .clickable { viewModel.setPrayerDate(date) }
                                     .padding(horizontal = 4.dp, vertical = 3.dp)
                             ) {
-                                // Top-Left: Masehi Number
+                                // Top-Left: Hijri Arabic
                                 Text(
-                                    text = "${triple.gregorianDay}",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = if (isSelected) AmberAccent else TextPrimary,
-                                    modifier = Modifier.align(Alignment.TopStart)
+                                    text = triple.hijriDayArabic,
+                                    fontFamily = ArabicFontFamily,
+                                    fontSize = 12.sp,
+                                    color = if (isSelected) AmberAccent else TextPrimary.copy(alpha = 0.8f),
+                                    modifier = Modifier.align(Alignment.TopStart).offset(x = 2.dp)
                                 )
 
-                                // Top-Right: Pasaran Jawa (Legi, Pahing, etc.)
+                                // Top-Right: Pasaran Jawa
                                 Text(
                                     text = triple.pasaran,
                                     fontSize = 8.sp,
@@ -427,16 +427,22 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                     modifier = Modifier.align(Alignment.TopEnd)
                                 )
 
-                                // Center: Hijri Date in Arabic Numerals (١, ٢, ...)
+                                // Center: Gregorian Number (Masehi - Utama)
                                 Text(
-                                    text = triple.hijriDayArabic,
-                                    fontFamily = ArabicFontFamily,
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.Bold,
+                                    text = "${triple.gregorianDay}",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.ExtraBold,
                                     color = if (isSelected) AmberAccent else Color(0xFFF8FAFC),
-                                    modifier = Modifier
-                                        .align(Alignment.Center)
-                                        .offset(y = 5.dp)
+                                    modifier = Modifier.align(Alignment.Center).offset(y = 2.dp)
+                                )
+                                
+                                // Bottom-Right: Hijri Number (Latin)
+                                Text(
+                                    text = "${triple.hijriDayNumber}",
+                                    fontSize = 8.sp,
+                                    fontWeight = FontWeight.Light,
+                                    color = if (isSelected) AmberAccent else TextSecondary,
+                                    modifier = Modifier.align(Alignment.BottomEnd)
                                 )
                             }
                         } else {
