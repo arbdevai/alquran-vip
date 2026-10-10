@@ -3,69 +3,65 @@ package com.arbdevai.quranvip.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ==========================================
-// 1. Root Canvas & Rich AMOLED Dark Surfaces
+// 1. Root Canvas & Bento Grid Surfaces (Desert Sand)
 // ==========================================
-val BgCanvas = Color(0xFF000000)             // Pure pitch black AMOLED
-val SurfaceCard = Color(0xFF14171E)          // Deep slate card surface
-val SurfaceRaised = Color(0xFF1C2028)        // Raised surface for dialogs & popups
-val SurfaceInput = Color(0xFF181B22)         // Search bar & input fields
-val SurfacePill = Color(0xFF222631)          // Pill badges & chips
-val BorderSubtle = Color(0x1FFFFFFF)         // 12% white outline border
+val BgCanvas = Color(0xFFF8F5F0)             // Desert Sand Background (Warm & easy on eyes)
+val SurfaceCard = Color(0xFFFFFFFF)          // Pure White Bento Boxes
+val SurfaceRaised = Color(0xFFFFFFFF)        // Dialogs
+val SurfaceInput = Color(0xFFF0ECE4)         // Search bar & inputs
+val SurfacePill = Color(0xFFEBE6DD)          // Pills & chips
+val BorderSubtle = Color(0xFFE5DFD5)         // Clean subtle border for Bento Grid
 
 // ==========================================
-// 2. Signature Emerald-Teal Identity (Yasin)
+// 2. Copper & Emerald Identity
 // ==========================================
-val EmeraldGradientStart = Color(0xFF075E54) // Deep Islamic green
-val EmeraldGradientMid = Color(0xFF087F67)   // Vibrant emerald teal
-val EmeraldGradientEnd = Color(0xFF10A37F)   // Fresh luminous mint
+// Primary Accent: Warm Copper
+val AmberAccent = Color(0xFFC67C4E)          // Copper Accent (replaces Amber)
+val AmberPressed = Color(0xFFA6643B)         // Copper Pressed
+val AmberSoft = Color(0x26C67C4E)            // Copper background wash
 
-// Warm Gold / Amber Accent for active states & highlights
-val AmberAccent = Color(0xFFFFB020)          // Luminous warm amber gold
-val AmberPressed = Color(0xFFE59807)         // Pressed state
-val AmberSoft = Color(0x2BFFB020)            // Glow / background wash
+// Hero Banner Gradient (Optional use for Hero Cards)
+val EmeraldGradientStart = Color(0xFFDCA983) // Soft Copper
+val EmeraldGradientMid = Color(0xFFC67C4E)   // Base Copper
+val EmeraldGradientEnd = Color(0xFFB0643A)   // Deep Copper
 
 // ==========================================
 // 3. Typographic Text Hierarchy
 // ==========================================
-val TextPrimary = Color(0xFFFFFFFF)          // Pure white for Arabic verses & titles
-val TextTransliteration = Color(0xFFFFB020)  // Warm golden transliteration
-val TextTranslation = Color(0xFFCBD5E1)      // Crisp silver-gray for Indonesian translation
-val TextSecondary = Color(0xFF94A3B8)        // Slate metadata & captions
-val TextPlaceholder = Color(0xFF64748B)      // Search hints
+val TextPrimary = Color(0xFF2D2A26)          // Espresso Dark for primary text
+val TextTransliteration = Color(0xFFC67C4E)  // Copper for transliteration
+val TextTranslation = Color(0xFF5A554E)      // Medium warm gray for translation
+val TextSecondary = Color(0xFF8A857C)        // Light warm gray for captions
+val TextPlaceholder = Color(0xFFA19C92)      // Search hints
 
 // ==========================================
-// 4. Feature Tile Icon Gradients (Yasin Style)
+// 4. Feature Tile / Bento Icon Colors
 // ==========================================
-val TileQuranStart = Color(0xFF0A84FF)
-val TileQuranEnd = Color(0xFF5AC8FA)
+// In Bento Grid, we avoid gradients and use solid, soft elegant colors
+val TileQuranStart = Color(0xFF507871)       // Deep Muted Emerald
+val TileQuranEnd = Color(0xFF507871)
 
-val TileJadwalStart = Color(0xFF30D158)
-val TileJadwalEnd = Color(0xFF00C7BE)
+val TileJadwalStart = Color(0xFFB28C5E)      // Desert Gold
+val TileJadwalEnd = Color(0xFFB28C5E)
 
-val TileTasbihStart = Color(0xFFFF9F0A)
-val TileTasbihEnd = Color(0xFFFF453A)
+val TileTasbihStart = Color(0xFFC67C4E)      // Copper
+val TileTasbihEnd = Color(0xFFC67C4E)
 
-val TileBookmarkStart = Color(0xFFFF375F)
-val TileBookmarkEnd = Color(0xFFBF5AF2)
+val TileBookmarkStart = Color(0xFF886358)    // Warm Terracotta
+val TileBookmarkEnd = Color(0xFF886358)
 
-val TileSettingsStart = Color(0xFF5E5CE6)
-val TileSettingsEnd = Color(0xFF64D2FF)
+val TileSettingsStart = Color(0xFF5B6973)    // Slate Blue-Gray
+val TileSettingsEnd = Color(0xFF5B6973)
 
-// Category colors for backwards compatibility
-val CatQuran = Color(0xFF0A84FF)
-val CatJadwal = Color(0xFF30D158)
-val CatTasbih = Color(0xFFFF9F0A)
-val CatTahlil = Color(0xFFFF375F)
-val CatDoa = Color(0xFF00C7BE)
-val CatHadroh = Color(0xFF5E5CE6)
+val CatJadwal = Color(0xFFB28C5E)
 
 // ==========================================
-// 5. Modern Translucent Dock & Card Tokens
+// 5. Solid / Flat Fallbacks (Removing Glassmorphism)
 // ==========================================
-val GlassBackground = Color(0xB8121418)
-val GlassSurface = Color(0xDB161A22)          // Rich translucent card
-val GlassNavbar = Color(0xEA141720)           // Floating island navigation bar (translucent frosted glass)
-val GlassBorder = Color(0x29FFFFFF)           // Specular rim border (16% white)
-val GlassBorderGlow = Color(0x52FFB020)       // Warm gold active glow
-val GlassHighlight = Color(0x1FFFFFFF)
-val GlassCardPressed = Color(0xEE1E232F)
+val GlassBackground = SurfaceCard
+val GlassSurface = SurfaceCard
+val GlassNavbar = Color(0xFFFFFFFF)           // Solid white navbar
+val GlassBorder = BorderSubtle
+val GlassBorderGlow = AmberAccent
+val GlassHighlight = Color.Transparent
+val GlassCardPressed = Color(0xFFF7F4F0)
