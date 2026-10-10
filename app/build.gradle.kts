@@ -17,7 +17,7 @@ if (signingPropertiesFile.exists()) {
 
 android {
     namespace = "com.arbdevai.quranvip"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.arbdevai.quranvip"
