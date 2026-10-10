@@ -252,7 +252,7 @@ fun CalendarScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
                         val date = Instant.ofEpochMilli(millis).atZone(ZoneOffset.UTC).toLocalDate()
-                        viewModel.selectPrayerDate(date)
+                        viewModel.setPrayerDate(date)
                     }
                     showDatePicker = false
                 }) { Text("Pilih", color = AmberAccent) }
