@@ -59,30 +59,27 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             val cityText = state.preferences.city?.lokasi ?: "Lokasi GPS"
 
             // 30 Rotating Quotes
-            val quotes = remember {
-                listOf(
-                    Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28"),
-                    Triple("فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ", "Maka nikmat Tuhanmu yang manakah yang kamu dustakan?", "QS. Ar-Rahman: 13"),
-                    Triple("إِنَّ مَعَ الْعُسْرِ يُسْرًا", "Sesungguhnya sesudah kesulitan itu ada kemudahan.", "QS. Al-Insyirah: 6"),
-                    Triple("لَا تَحْزَنْ إِنَّ اللَّهَ مَعَنَا", "Janganlah engkau bersedih, sesungguhnya Allah bersama kita.", "QS. At-Taubah: 40"),
-                    Triple("وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ", "Dan Dia bersama kamu di mana saja kamu berada.", "QS. Al-Hadid: 4"),
-                    Triple("وَاللَّهُ يَعْلَمُ وَأَنتُمْ لَا تَعْلَمُونَ", "Allah mengetahui, sedang kamu tidak mengetahui.", "QS. Al-Baqarah: 216"),
-                    Triple("فَاصْبِرْ صَبْرًا جَمِيلًا", "Maka bersabarlah dengan kesabaran yang baik.", "QS. Al-Ma'arij: 5"),
-                    Triple("وَقُل رَّبِّ زِدْنِي عِلْمًا", "Dan katakanlah: Ya Tuhanku, tambahkanlah kepadaku ilmu.", "QS. Taha: 114"),
-                    Triple("إِنَّ اللَّهَ يُحِبُّ الْمُتَوَكِّلِينَ", "Sesungguhnya Allah menyukai orang-orang yang bertawakal kepada-Nya.", "QS. Ali 'Imran: 159"),
-                    Triple("وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ", "Dan tidak ada taufik bagiku melainkan dengan (pertolongan) Allah.", "QS. Hud: 88"),
-                    Triple("حَسْبُنَا اللَّهُ وَنِعْمَ الْوَكِيلُ", "Cukuplah Allah menjadi Penolong kami dan Allah adalah sebaik-baik Pelindung.", "QS. Ali 'Imran: 173"),
-                    Triple("وَرَحْمَتِي وَسِعَتْ كُلَّ شَيْءٍ", "Dan rahmat-Ku meliputi segala sesuatu.", "QS. Al-A'raf: 156"),
-                    Triple("إِنَّ اللَّهَ مَعَ الصَّابِرِينَ", "Sesungguhnya Allah beserta orang-orang yang sabar.", "QS. Al-Baqarah: 153"),
-                    Triple("فَاذْكُرُونِي أَذْكُرْكُمْ", "Karena itu, ingatlah kamu kepada-Ku niscaya Aku ingat (pula) kepadamu.", "QS. Al-Baqarah: 152"),
-                    Triple("ادْعُونِي أَسْتَجِبْ لَكُمْ", "Berdoalah kepada-Ku, niscaya akan Kuperkenankan bagimu.", "QS. Ghafir: 60"),
-                    Triple("وَأَحْسِنُوا ۛ إِنَّ اللَّهَ يُحِبُّ الْمُحْسِنِينَ", "Dan berbuat baiklah, karena sesungguhnya Allah menyukai orang-orang yang berbuat baik.", "QS. Al-Baqarah: 195"),
-                    Triple("وَتَوَكَّلْ عَلَى اللَّهِ ۚ وَكَفَىٰ بِاللَّهِ وَكِيلًا", "Dan bertawakallah kepada Allah. Dan cukuplah Allah sebagai Pemelihara.", "QS. Al-Ahzab: 3")
-                )
+            val quotes = remember(context) {
+                try {
+                    val jsonStr = context.assets.open("quotes.json").bufferedReader().use { it.readText() }
+                    val jsonArray = org.json.JSONArray(jsonStr)
+                    val list = mutableListOf<Triple<String, String, String>>()
+                    for (i in 0 until jsonArray.length()) {
+                        val obj = jsonArray.getJSONObject(i)
+                        list.add(Triple(obj.getString("arabic"), obj.getString("meaning"), obj.getString("source")))
+                    }
+                    if (list.isEmpty()) {
+                        listOf(Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28"))
+                    } else {
+                        list
+                    }
+                } catch (e: Exception) {
+                    listOf(Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28"))
+                }
             }
-            }
+            
             // Select random quote on composition
-            val randomQuote = remember { quotes.random() }
+            val randomQuote = remember(quotes) { quotes.random() }
 
             QuranHeroBanner(
                 title = "Al-Qur'an VIP",
