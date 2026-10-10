@@ -29,18 +29,15 @@ fun GlassCard(
     content: @Composable BoxScope.() -> Unit
 ) {
     val clickModifier = if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
-    Box(
+    androidx.compose.material3.Surface(
         modifier = modifier
             .clip(shape)
-            .background(containerColor)
-            .border(
-                BorderStroke(
-                    borderWidth,
-                    borderColor
-                ),
-                shape
-            )
+            .border(BorderStroke(borderWidth, borderColor), shape)
             .then(clickModifier),
-        content = content
-    )
+        shape = shape,
+        color = containerColor,
+        shadowElevation = 8.dp
+    ) {
+        Box(content = content)
+    }
 }

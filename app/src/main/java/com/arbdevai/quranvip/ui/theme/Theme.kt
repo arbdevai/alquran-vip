@@ -1,11 +1,11 @@
 package com.arbdevai.quranvip.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val QuranColorScheme = darkColorScheme(
+private val QuranColorScheme = lightColorScheme(
     primary = AmberAccent,
     onPrimary = Color(0xFF141518),
     primaryContainer = SurfacePill,

@@ -93,98 +93,111 @@ fun QuranApp(state: UiState, viewModel: AppViewModel) {
             }
         }
 
-        // True Floating Island Navigation Bar - No solid black bar behind it
         if (state.reader == null) {
-            FloatingIslandNavbar(
+            CorporateBottomNavbar(
                 currentScreen = state.screen,
                 onScreenSelected = viewModel::setScreen,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(horizontal = 20.dp, vertical = 14.dp)
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
     }
 }
 
 @Composable
-private fun FloatingIslandNavbar(
+private fun CorporateBottomNavbar(
     currentScreen: AppScreen,
     onScreenSelected: (AppScreen) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .border(
-                BorderStroke(1.dp, GlassBorder),
-                RoundedCornerShape(32.dp)
-            ),
-        shape = RoundedCornerShape(32.dp),
-        color = GlassNavbar,
-        shadowElevation = 18.dp
+        modifier = modifier.fillMaxWidth(),
+        color = Color.White,
+        shadowElevation = 16.dp,
+        border = BorderStroke(1.dp, BorderSubtle.copy(alpha = 0.5f))
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 6.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly,
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .height(72.dp)
+                .padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IslandNavItem(Icons.Default.Home, "Beranda", currentScreen == AppScreen.HOME) { onScreenSelected(AppScreen.HOME) }
-            IslandNavItem(Icons.Default.MenuBook, "Al-Qur'an", currentScreen == AppScreen.QURAN) { onScreenSelected(AppScreen.QURAN) }
-            IslandNavItem(Icons.Default.AccessTime, "Salat", currentScreen == AppScreen.PRAYER) { onScreenSelected(AppScreen.PRAYER) }
-            IslandNavItem(Icons.Default.CalendarMonth, "Kalender", currentScreen == AppScreen.CALENDAR) { onScreenSelected(AppScreen.CALENDAR) }
-            IslandNavItem(Icons.Default.TouchApp, "Tasbih", currentScreen == AppScreen.TASBIH) { onScreenSelected(AppScreen.TASBIH) }
+            val navItems = listOf(
+                Pair(AppScreen.HOME, Icons.Default.Home) to "Beranda",
+                Pair(AppScreen.QURAN, Icons.Default.MenuBook) to "Al-Qur'an",
+                Pair(AppScreen.PRAYER, Icons.Default.AccessTime) to "Salat",
+                Pair(AppScreen.CALENDAR, Icons.Default.CalendarMonth) to "Kalender",
+                Pair(AppScreen.TASBIH, Icons.Default.TouchApp) to "Tasbih"
+            )
+
+            navItems.forEach { (item, label) ->
+                val (screen, icon) = item
+                CorporateNavItem(
+                    icon = icon,
+                    label = label,
+                    selected = currentScreen == screen,
+                    onClick = { onScreenSelected(screen) },
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun IslandNavItem(
+private fun CorporateNavItem(
     icon: ImageVector,
     label: String,
     selected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val tint by animateColorAsState(
         targetValue = if (selected) AmberAccent else TextSecondary,
         label = "navTint"
     )
-    val scale by animateFloatAsState(
-        targetValue = if (selected) 1.15f else 1.0f,
+    val indicatorHeight by animateFloatAsState(
+        targetValue = if (selected) 4f else 0f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
-        label = "navScale"
+        label = "navIndicator"
     )
     val interaction = remember { MutableInteractionSource() }
 
-    Row(
-        modifier = Modifier
-            .scale(scale)
-            .clip(CircleShape)
-            .clickable(interactionSource = interaction, indication = null, onClick = onClick)
-            .background(if (selected) AmberAccent.copy(alpha = 0.18f) else Color.Transparent)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+    Box(
+        modifier = modifier
+            .fillMaxHeight()
+            .clickable(interactionSource = interaction, indication = null, onClick = onClick),
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(20.dp)
-        )
-        AnimatedVisibility(visible = selected) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = label,
-                    color = tint,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = label,
+                color = tint,
+                fontSize = 11.sp,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+            )
         }
+        
+        // Top Animated Indicator
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .width(32.dp)
+                .height(indicatorHeight.dp)
+                .clip(RoundedCornerShape(bottomStart = 4.dp, bottomEnd = 4.dp))
+                .background(tint)
+        )
     }
 }
