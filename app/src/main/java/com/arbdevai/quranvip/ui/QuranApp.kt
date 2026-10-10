@@ -5,6 +5,9 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -26,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -113,16 +117,7 @@ private fun FloatingIslandNavbar(
             .fillMaxWidth()
             .height(64.dp)
             .border(
-                BorderStroke(
-                    1.dp,
-                    Brush.linearGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.25f),
-                            Color.White.copy(alpha = 0.05f),
-                            AmberAccent.copy(alpha = 0.35f)
-                        )
-                    )
-                ),
+                BorderStroke(1.dp, GlassBorder),
                 RoundedCornerShape(32.dp)
             ),
         shape = RoundedCornerShape(32.dp),
@@ -156,10 +151,16 @@ private fun IslandNavItem(
         targetValue = if (selected) AmberAccent else TextSecondary,
         label = "navTint"
     )
+    val scale by animateFloatAsState(
+        targetValue = if (selected) 1.15f else 1.0f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "navScale"
+    )
     val interaction = remember { MutableInteractionSource() }
 
     Column(
         modifier = Modifier
+            .scale(scale)
             .clip(CircleShape)
             .clickable(interactionSource = interaction, indication = null, onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 4.dp),

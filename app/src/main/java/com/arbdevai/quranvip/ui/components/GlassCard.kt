@@ -36,13 +36,7 @@ fun GlassCard(
             .border(
                 BorderStroke(
                     borderWidth,
-                    Brush.linearGradient(
-                        listOf(
-                            borderColor,
-                            Color.White.copy(alpha = 0.05f),
-                            Color(0xFFFFB020).copy(alpha = 0.20f)
-                        )
-                    )
+                    borderColor
                 ),
                 shape
             )
