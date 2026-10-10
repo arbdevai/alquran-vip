@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arbdevai.quranvip.data.model.Day
+import com.arbdevai.quranvip.data.model.PrayerDay
 import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.theme.AmberAccent
 import com.arbdevai.quranvip.ui.theme.TextPrimary
@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun NextPrayerCountdownCard(day: Day, modifier: Modifier = Modifier) {
+fun NextPrayerCountdownCard(day: PrayerDay, modifier: Modifier = Modifier) {
     var currentTime by remember { mutableStateOf(System.currentTimeMillis()) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -52,7 +52,7 @@ fun NextPrayerCountdownCard(day: Day, modifier: Modifier = Modifier) {
     }
 
     if (nextPrayer != null) {
-        // Calculate diff
+        var countdown = "00:00:00"
         try {
             val calNow = Calendar.getInstance()
             val calNext = Calendar.getInstance()
@@ -69,22 +69,22 @@ fun NextPrayerCountdownCard(day: Day, modifier: Modifier = Modifier) {
             val hours = diffMs / (1000 * 60 * 60)
             val mins = (diffMs / (1000 * 60)) % 60
             val secs = (diffMs / 1000) % 60
-            val countdown = String.format("%02d:%02d:%02d", hours, mins, secs)
-
-            GlassCard(modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), containerColor = AmberAccent.copy(alpha = 0.1f), borderColor = AmberAccent.copy(alpha = 0.4f)) {
-                Row(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Column {
-                        Text("Menuju ${nextPrayer.first}", style = MaterialTheme.typography.labelSmall, color = AmberAccent, fontWeight = FontWeight.Bold)
-                        Spacer(Modifier.height(4.dp))
-                        Text("- $countdown", style = MaterialTheme.typography.headlineMedium, color = TextPrimary, fontWeight = FontWeight.ExtraBold)
-                    }
-                    Box(modifier = Modifier.size(48.dp).background(AmberAccent.copy(alpha = 0.2f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = AmberAccent)
-                    }
-                }
-            }
+            countdown = String.format("%02d:%02d:%02d", hours, mins, secs)
         } catch (e: Exception) {
             // Ignore parse errors
+        }
+
+        GlassCard(modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp), containerColor = AmberAccent.copy(alpha = 0.1f), borderColor = AmberAccent.copy(alpha = 0.4f)) {
+            Row(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Column {
+                    Text("Menuju ${nextPrayer.first}", style = MaterialTheme.typography.labelSmall, color = AmberAccent, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(4.dp))
+                    Text("- $countdown", style = MaterialTheme.typography.headlineMedium, color = TextPrimary, fontWeight = FontWeight.ExtraBold)
+                }
+                Box(modifier = Modifier.size(48.dp).background(AmberAccent.copy(alpha = 0.2f), RoundedCornerShape(14.dp)), contentAlignment = Alignment.Center) {
+                    Icon(Icons.Default.NotificationsActive, contentDescription = null, tint = AmberAccent)
+                }
+            }
         }
     }
 }
