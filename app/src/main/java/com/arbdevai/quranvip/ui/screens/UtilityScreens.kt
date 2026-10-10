@@ -1100,6 +1100,53 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         ) {
             Text("Simpan Zona Waktu")
         }
+
+        Spacer(Modifier.height(24.dp))
+        Text("Info Aplikasi", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = AmberAccent)
+        Spacer(Modifier.height(8.dp))
+        
+        var showChangelog by remember { mutableStateOf(false) }
+        
+        GlassCard(
+            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+            shape = RoundedCornerShape(16.dp),
+            onClick = { if (state.latestUpdate != null) showChangelog = true }
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Al-Quran VIP", color = TextPrimary, fontWeight = FontWeight.Bold)
+                    Text("Versi ${com.arbdevai.quranvip.BuildConfig.VERSION_NAME}", color = TextSecondary, style = MaterialTheme.typography.labelSmall)
+                }
+                if (state.latestUpdate != null) {
+                    TextButton(onClick = { showChangelog = true }) {
+                        Text("Lihat Changelog", color = AmberAccent, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
+        
+        if (showChangelog && state.latestUpdate != null) {
+            val update = state.latestUpdate
+            AlertDialog(
+                onDismissRequest = { showChangelog = false },
+                title = { Text("Changelog ${update.tag_name}", color = AmberAccent, fontWeight = FontWeight.Bold) },
+                text = {
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        item {
+                            Text(update.body, color = TextPrimary, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                },
+                confirmButton = {
+                    TextButton(onClick = { showChangelog = false }) { Text("Tutup", color = AmberAccent) }
+                },
+                containerColor = SurfaceCard,
+                shape = RoundedCornerShape(16.dp)
+            )
+        }
     }
 }
 
