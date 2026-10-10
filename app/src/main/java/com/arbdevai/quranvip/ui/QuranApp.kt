@@ -41,6 +41,70 @@ import com.arbdevai.quranvip.ui.screens.*
 import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
+fun QuranApp(state: UiState, viewModel: AppViewModel) {
+    // Auto-prompt GPS permission on first launch for accurate prayer times
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            viewModel.detectLocation()
+        } else {
+            viewModel.locationPermissionDenied()
+        }
+    }
+
+    LaunchedEffect(state.preferencesReady) {
+        if (state.preferencesReady && state.preferences.city == null) {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
+        }
+    }
+
+    // Multi-tier Back Button Navigation
+    BackHandler(enabled = state.reader != null) {
+        viewModel.closeReader()
+    }
+    BackHandler(enabled = state.reader == null && state.screen != AppScreen.HOME) {
+        viewModel.setScreen(AppScreen.HOME)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(BgCanvas)
+            .statusBarsPadding()
+    ) {
+        // Screen Content spans full height so it scrolls BEHIND the floating dock
+        Box(modifier = Modifier.fillMaxSize()) {
+            when (state.screen) {
+                AppScreen.HOME -> HomeScreen(state, viewModel)
+                AppScreen.QURAN -> QuranScreen(state, viewModel)
+                AppScreen.PRAYER -> PrayerScreen(state, viewModel)
+                AppScreen.CALENDAR -> CalendarScreen(state, viewModel)
+                AppScreen.BOOKMARKS -> BookmarksScreen(state, viewModel)
+                AppScreen.SETTINGS -> SettingsScreen(state, viewModel)
+                AppScreen.TASBIH -> TasbihScreen(state, viewModel)
+            }
+        }
+
+        if (state.reader == null) {
+            FloatingIslandNavbar(
+                currentScreen = state.screen,
+                onScreenSelected = viewModel::setScreen,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+    }
+}
+
+@Composable
+@Composable
 private fun FloatingIslandNavbar(
     currentScreen: AppScreen,
     onScreenSelected: (AppScreen) -> Unit,
