@@ -42,25 +42,25 @@ fun QuranHeroBanner(
             .clip(RoundedCornerShape(26.dp))
             .background(Brush.linearGradient(colors = gradientColors))
             .border(
-                BorderStroke(
-                    1.2.dp,
-                    Brush.linearGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.40f),
-                            Color.White.copy(alpha = 0.15f)
+                    BorderStroke(
+                        1.2.dp,
+                        Brush.linearGradient(
+                            listOf(
+                                TextPrimary.copy(alpha = 0.40f),
+                                TextPrimary.copy(alpha = 0.15f)
+                            )
                         )
-                    )
-                ),
+                    ),
                 RoundedCornerShape(26.dp)
             )
-            .padding(20.dp)
+            .padding(12.dp)
     ) {
         // Islamic Watermark Emblem (۞) in background
         Text(
             text = arabicWatermark,
             fontFamily = ArabicFontFamily,
-            fontSize = 120.sp,
-            color = Color.White.copy(alpha = 0.12f),
+            fontSize = 72.sp,
+            color = Color.White.copy(alpha = 0.08f),
             textAlign = TextAlign.End,
             style = TextStyle(
                 textDirection = TextDirection.Rtl,
@@ -68,7 +68,7 @@ fun QuranHeroBanner(
             ),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .offset(x = 16.dp, y = 26.dp)
+                .offset(x = 10.dp, y = 16.dp)
         )
 
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -119,17 +119,17 @@ fun QuranHeroBanner(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = Color.White,
-                        lineHeight = 32.sp
+                        lineHeight = 28.sp
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     // Subtitle with clean breathing room
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = Color.White.copy(alpha = 0.90f),
-                        lineHeight = 22.sp
+                        lineHeight = 20.sp
                     )
                 }
 

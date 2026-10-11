@@ -54,37 +54,25 @@ private fun SurahListScreen(state: UiState, viewModel: AppViewModel, modifier: M
         contentPadding = PaddingValues(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 100.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // 1. Clean Header (No Fluff Banner)
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "Al-Qur'an",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                    Text(
-                        text = "114 Surah",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = TextSecondary
-                    )
-                }
-                FilledIconButton(
-                    onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = SurfaceCard,
-                        contentColor = TextPrimary
-                    ),
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
-                }
-            }
+            QuranHeroBanner(
+                title = "Al-Qur'an",
+                subtitle = "114 Surah, Arab, Latin & Terjemahan",
+                tag = "MUSHAF",
+                trailingContent = {
+                    FilledIconButton(
+                        onClick = { viewModel.setScreen(AppScreen.SETTINGS) },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.Black.copy(alpha = 0.35f),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(Icons.Default.Tune, contentDescription = "Pengaturan")
+                    }
+                },
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
 
         // 2. Search Field Bar
@@ -201,6 +189,18 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
         }
     }
 
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }.collect { index ->
+            if (reader != null && reader.ayat.isNotEmpty()) {
+                val hasBismillah = reader.nomor != 1 && reader.nomor != 9
+                val ayahIndex = if (hasBismillah) index - 1 else index
+                if (ayahIndex in reader.ayat.indices) {
+                    viewModel.recordReading(reader.ayat[ayahIndex].nomorAyat)
+                }
+            }
+        }
+    }
+
     Column(modifier = modifier.fillMaxSize().background(BgCanvas)) {
         when {
             state.readerLoading -> {
@@ -281,13 +281,6 @@ private fun ReaderScreen(state: UiState, viewModel: AppViewModel, modifier: Modi
                                 onTafsir = { viewModel.loadTafsir(ayah.nomorAyat) },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            LaunchedEffect(ayah.nomorAyat) {
-                                snapshotFlow { listState.firstVisibleItemIndex }.collect { index ->
-                                    if (index >= 1 && reader.ayat.getOrNull(index - 1)?.nomorAyat == ayah.nomorAyat) {
-                                        viewModel.recordReading(ayah.nomorAyat)
-                                    }
-                                }
-                            }
                         }
                     }
 
@@ -318,38 +311,35 @@ private fun ReaderHeaderBar(
     onBack: () -> Unit,
     onPickQori: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(SurfaceCard)
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Spacer(modifier = Modifier.width(6.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Surah ${reader.namaLatin}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
-            Text(
-                text = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
-                style = MaterialTheme.typography.labelSmall,
-                color = TextSecondary
-            )
-        }
-        Text(
-            text = reader.nama,
-            fontFamily = ArabicFontFamily,
-            fontSize = 24.sp,
-            color = AmberAccent,
-            modifier = Modifier.padding(end = 8.dp)
+    Box(modifier = Modifier.padding(start = 18.dp, end = 18.dp, top = 14.dp, bottom = 8.dp)) {
+        com.arbdevai.quranvip.ui.components.QuranHeroBanner(
+            title = "Surah ${reader.namaLatin}",
+            subtitle = "${reader.arti} · ${reader.tempatTurun} · ${reader.jumlahAyat} Ayat",
+            tag = "BACAAN",
+            arabicWatermark = reader.nama,
+            trailingContent = {
+                FilledIconButton(
+                    onClick = onPickQori,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.RecordVoiceOver, contentDescription = "Pilih Qari")
+                }
+                FilledIconButton(
+                    onClick = onBack,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color.Black.copy(alpha = 0.35f),
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Tutup")
+                }
+            }
         )
-        IconButton(onClick = onPickQori) {
-            Icon(Icons.Default.RecordVoiceOver, contentDescription = "Pilih Qari", tint = AmberAccent)
-        }
     }
 }
 

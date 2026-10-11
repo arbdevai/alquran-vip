@@ -63,22 +63,23 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
             val cityText = state.preferences.city?.lokasi ?: "Lokasi GPS"
 
             // 30 Rotating Quotes
-            val quotes = remember(context) {
-                try {
-                    val jsonStr = context.assets.open("quotes.json").bufferedReader().use { it.readText() }
-                    val jsonArray = org.json.JSONArray(jsonStr)
-                    val list = mutableListOf<Triple<String, String, String>>()
-                    for (i in 0 until jsonArray.length()) {
-                        val obj = jsonArray.getJSONObject(i)
-                        list.add(Triple(obj.getString("arabic"), obj.getString("meaning"), obj.getString("source")))
+            val quotes by androidx.compose.runtime.produceState(
+                initialValue = listOf(Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28")),
+                key1 = context
+            ) {
+                value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    try {
+                        val jsonStr = context.assets.open("quotes.json").bufferedReader().use { it.readText() }
+                        val jsonArray = org.json.JSONArray(jsonStr)
+                        val list = mutableListOf<Triple<String, String, String>>()
+                        for (i in 0 until jsonArray.length()) {
+                            val obj = jsonArray.getJSONObject(i)
+                            list.add(Triple(obj.getString("arabic"), obj.getString("meaning"), obj.getString("source")))
+                        }
+                        if (list.isNotEmpty()) list else value
+                    } catch (e: Exception) {
+                        value
                     }
-                    if (list.isEmpty()) {
-                        listOf(Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28"))
-                    } else {
-                        list
-                    }
-                } catch (e: Exception) {
-                    listOf(Triple("اَلَا بِذِكْرِ اللّٰهِ تَطْمَىِٕنُّ الْقُلُوْبُ", "Ingatlah, hanya dengan mengingat Allah hati menjadi tenteram.", "QS. Ar-Ra'd: 28"))
                 }
             }
             
@@ -417,7 +418,7 @@ private fun LastReadCard(
                 onClick = onClick,
                 colors = IconButtonDefaults.filledIconButtonColors(
                     containerColor = AmberAccent,
-                    contentColor = Color.Black
+                    contentColor = OnAmberAccent
                 ),
                 modifier = Modifier.size(38.dp)
             ) {

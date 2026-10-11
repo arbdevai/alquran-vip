@@ -19,6 +19,7 @@ val BorderSubtle: Color @Composable get() = if (LocalThemeIsDark.current) Color(
 val AmberAccent: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFFFFFFFF) else Color(0xFF0F172A)
 val AmberPressed: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFFF1F5F9) else Color(0xFF334155)
 val AmberSoft: Color @Composable get() = if (LocalThemeIsDark.current) Color(0x33FFFFFF) else Color(0x1A0F172A)
+val OnAmberAccent: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF0F172A) else Color(0xFFFFFFFF)
 
 val EmeraldGradientStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF475569) else Color(0xFF334155)
 val EmeraldGradientMid: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF334155) else Color(0xFF1E293B)

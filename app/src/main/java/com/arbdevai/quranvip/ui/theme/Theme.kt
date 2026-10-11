@@ -12,10 +12,11 @@ val LocalThemeIsDark = compositionLocalOf { false }
 
 @Composable
 fun QuranVipTheme(content: @Composable () -> Unit) {
-    val colorScheme = if (LocalThemeIsDark.current) {
+    val isDark = LocalThemeIsDark.current
+    val colorScheme = if (isDark) {
         darkColorScheme(
             primary = AmberAccent,
-            onPrimary = Color(0xFF141518),
+            onPrimary = OnAmberAccent,
             primaryContainer = SurfacePill,
             onPrimaryContainer = TextPrimary,
             secondary = EmeraldGradientStart,
@@ -32,7 +33,7 @@ fun QuranVipTheme(content: @Composable () -> Unit) {
     } else {
         lightColorScheme(
             primary = AmberAccent,
-            onPrimary = Color(0xFF141518),
+            onPrimary = OnAmberAccent,
             primaryContainer = SurfacePill,
             onPrimaryContainer = TextPrimary,
             secondary = EmeraldGradientStart,
@@ -46,6 +47,17 @@ fun QuranVipTheme(content: @Composable () -> Unit) {
             outline = BorderSubtle,
             error = Color(0xFFE57373)
         )
+    }
+    
+    val view = androidx.compose.ui.platform.LocalView.current
+    if (!view.isInEditMode) {
+        androidx.compose.runtime.SideEffect {
+            val window = (view.context as android.app.Activity).window
+            androidx.core.view.WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !isDark
+                isAppearanceLightNavigationBars = !isDark
+            }
+        }
     }
 
     MaterialTheme(

@@ -112,7 +112,7 @@ fun QuranAyahCard(
                             text = "${ayah.nomorAyat}",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (isPlaying) Color.Black else Color.White
+                            color = if (isPlaying) OnAmberAccent else TextPrimary
                         )
                     }
 
@@ -129,7 +129,7 @@ fun QuranAyahCard(
                         Icon(
                             imageVector = if (isBookmarked) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                             contentDescription = if (isBookmarked) "Hapus bookmark" else "Simpan bookmark",
-                            tint = if (isBookmarked) AmberAccent else Color.White
+                            tint = if (isBookmarked) AmberAccent else TextSecondary
                         )
                     }
                     IconButton(onClick = onTafsir, modifier = Modifier.size(38.dp)) {
@@ -140,7 +140,7 @@ fun QuranAyahCard(
                         modifier = Modifier.size(36.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = AmberAccent,
-                            contentColor = Color.Black
+                            contentColor = OnAmberAccent
                         )
                     ) {
                         Icon(

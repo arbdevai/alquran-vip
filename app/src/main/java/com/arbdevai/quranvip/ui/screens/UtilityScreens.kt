@@ -173,29 +173,48 @@ fun PrayerScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                             )
                         }
                         Spacer(Modifier.height(16.dp))
+                        val format = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
+                        val nowStr = format.format(java.util.Date())
+                        var nextName = ""
+                        val mainTimes = day.times().filter { it.first in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya") }
+                        for (it in mainTimes) {
+                            if (nowStr < it.second) {
+                                nextName = it.first
+                                break
+                            }
+                        }
+                        if (nextName.isEmpty() && mainTimes.isNotEmpty()) {
+                            nextName = mainTimes.first().first
+                        }
+
                         day.times().forEach { (name, time) ->
+                            val isNext = name == nextName
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 10.dp),
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isNext) AmberAccent.copy(alpha = 0.15f) else Color.Transparent)
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     name,
-                                    color = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) TextPrimary else TextSecondary,
+                                    color = if (isNext) AmberAccent else if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) TextPrimary else TextSecondary,
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = if (name in listOf("Subuh", "Zuhur", "Asar", "Magrib", "Isya")) FontWeight.Bold else FontWeight.Normal
                                 )
                                 Text(
                                     time,
-                                    color = AmberAccent,
+                                    color = if (isNext) AmberAccent else TextPrimary,
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp
                                 )
                             }
-                            HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp)
+                            if (!isNext) {
+                                HorizontalDivider(color = BorderSubtle, thickness = 0.5.dp, modifier = Modifier.padding(horizontal = 12.dp))
+                            }
                         }
                     }
                 }
@@ -408,7 +427,7 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(2.dp)
-                                    .height(58.dp)
+                                    .height(68.dp)
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(
                                         when {
@@ -422,7 +441,7 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                         width = if (isSelected || isToday) 2.dp else 0.5.dp,
                                         color = when {
                                             isSelected -> AmberAccent
-                                            isToday -> Color.White
+                                            isToday -> TextPrimary
                                             else -> BorderSubtle
                                         },
                                         shape = RoundedCornerShape(10.dp)
@@ -441,11 +460,13 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
 
                                 // Top-Right: Pasaran Jawa
                                 Text(
-                                    text = triple.pasaran.take(3),
+                                    text = triple.pasaran,
                                     fontSize = 9.sp,
+                                    maxLines = 2,
+                                    lineHeight = 10.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (isSelected) AmberAccent else TextPrimary.copy(alpha = 0.9f),
-                                    modifier = Modifier.align(Alignment.TopEnd)
+                                    modifier = Modifier.align(Alignment.TopEnd).padding(end = 1.dp)
                                 )
 
                                 // Center: Gregorian Number (Masehi - Utama)
@@ -453,7 +474,7 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                     text = "${triple.gregorianDay}",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.ExtraBold,
-                                    color = if (isSelected) AmberAccent else Color(0xFFF8FAFC),
+                                    color = if (isSelected) AmberAccent else TextPrimary,
                                     modifier = Modifier.align(Alignment.Center).offset(y = 2.dp)
                                 )
                                 
@@ -761,7 +782,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                     label = { Text(zikir, fontSize = 11.5.sp) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = AmberAccent,
-                        selectedLabelColor = Color.Black
+                        selectedLabelColor = OnAmberAccent
                     ),
                     modifier = Modifier.weight(1f)
                 )
@@ -789,7 +810,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 ) {
                     Text(
                         text = label,
-                        color = if (isSelected) Color.Black else TextPrimary,
+                        color = if (isSelected) OnAmberAccent else TextPrimary,
                         fontSize = 12.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
@@ -1065,7 +1086,7 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
         Button(
             onClick = { viewModel.setZone(zone) },
             shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = Color.Black)
+            colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = OnAmberAccent)
         ) {
             Text("Simpan Zona Waktu")
         }
