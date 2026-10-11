@@ -143,7 +143,7 @@ private fun FloatingIslandNavbar(
 
                 navItems.forEach { (screen, icon) ->
                     val selected = currentScreen == screen
-                    val tint by animateColorAsState(if (selected) TextPrimary else TextSecondary, label = "tint")
+                    val tint by animateColorAsState(if (selected) AmberAccent else TextSecondary, label = "tint")
                     val bgAlpha by animateFloatAsState(if (selected) 1f else 0f, label = "bg")
                     
                     Box(

@@ -443,7 +443,7 @@ internal fun ErrorView(message: String?, retry: () -> Unit) {
             Spacer(Modifier.height(10.dp))
             Text(message ?: "Terjadi kesalahan", style = MaterialTheme.typography.bodyMedium, color = TextSecondary, textAlign = TextAlign.Center)
             Spacer(Modifier.height(12.dp))
-            Button(onClick = retry, colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = Color.Black)) {
+            Button(onClick = retry, colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = OnAmberAccent)) {
                 Text("Coba Lagi")
             }
         }

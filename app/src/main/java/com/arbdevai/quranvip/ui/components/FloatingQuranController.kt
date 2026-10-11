@@ -74,19 +74,19 @@ fun FloatingQuranController(
             }
             Button(
                 onClick = onPlayAll,
-                colors = ButtonDefaults.buttonColors(containerColor = AmberAccent),
+                colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = OnAmberAccent),
                 shape = CircleShape,
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Icon(
                     imageVector = if (isPlayingAll) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = null,
-                    tint = Color.Black
+                    tint = OnAmberAccent
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     if (isPlayingAll) "Jeda Surah" else "Putar Surah",
-                    color = Color.Black,
+                    color = OnAmberAccent,
                     fontWeight = FontWeight.SemiBold
                 )
             }
