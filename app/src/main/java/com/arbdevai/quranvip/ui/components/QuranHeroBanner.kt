@@ -33,7 +33,7 @@ fun QuranHeroBanner(
     arabicQuote: Triple<String, String, String>? = null,
     badges: List<String> = emptyList(),
     gradientColors: List<Color> = listOf(EmeraldGradientStart, EmeraldGradientMid, EmeraldGradientEnd),
-    trailingContent: @Composable (RowScope.() -> Unit)? = null,
+    trailingContent: (@Composable RowScope.() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Box(

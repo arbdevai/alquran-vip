@@ -34,6 +34,7 @@ import com.arbdevai.quranvip.ui.UiState
 import com.arbdevai.quranvip.ui.components.FloatingQuranController
 import com.arbdevai.quranvip.ui.components.GlassCard
 import com.arbdevai.quranvip.ui.components.QuranAyahCard
+import com.arbdevai.quranvip.ui.components.QuranHeroBanner
 import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
