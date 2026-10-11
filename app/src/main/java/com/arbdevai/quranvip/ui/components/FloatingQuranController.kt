@@ -16,8 +16,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.arbdevai.quranvip.ui.theme.AmberAccent
-import com.arbdevai.quranvip.ui.theme.GlassNavbar
+import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
 fun FloatingQuranController(
