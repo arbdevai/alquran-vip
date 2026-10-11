@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -192,7 +191,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Al-Qur'an",
                         subtitle = "114 Surah & Audio",
                         icon = Icons.Default.MenuBook,
-                        gradient = listOf(TileQuranStart, TileQuranEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.QURAN) }
                     )
@@ -200,7 +198,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Jadwal Salat",
                         subtitle = "Waktu Adzan Harian",
                         icon = Icons.Default.AccessTime,
-                        gradient = listOf(TileJadwalStart, TileJadwalEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.PRAYER) }
                     )
@@ -215,7 +212,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Kalender",
                         subtitle = "Penanggalan Hijriyah",
                         icon = Icons.Default.CalendarMonth,
-                        gradient = listOf(TileQuranStart, TileJadwalEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.CALENDAR) }
                     )
@@ -223,7 +219,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Tasbih Digital",
                         subtitle = "Penghitung Zikir",
                         icon = Icons.Default.TouchApp,
-                        gradient = listOf(TileTasbihStart, TileTasbihEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.TASBIH) }
                     )
@@ -238,7 +233,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Ayat Disimpan",
                         subtitle = "${state.preferences.bookmarks.size} Ayat Tersimpan",
                         icon = Icons.Default.Bookmark,
-                        gradient = listOf(TileBookmarkStart, TileBookmarkEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.BOOKMARKS) }
                     )
@@ -246,7 +240,6 @@ fun HomeScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = Mod
                         title = "Pengaturan",
                         subtitle = "Qari & Huruf Arab",
                         icon = Icons.Default.Tune,
-                        gradient = listOf(TileSettingsStart, TileSettingsEnd),
                         modifier = Modifier.weight(1f),
                         onClick = { viewModel.setScreen(AppScreen.SETTINGS) }
                     )
@@ -436,13 +429,12 @@ private fun FeatureTile(
     title: String,
     subtitle: String,
     icon: ImageVector,
-    gradient: List<Color>,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     GlassCard(
         modifier = modifier,
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         onClick = onClick
     ) {
         Column(
@@ -453,14 +445,14 @@ private fun FeatureTile(
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Brush.linearGradient(gradient)),
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(AmberSoft),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = Color.White,
+                    tint = AmberAccent,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -556,7 +548,7 @@ private fun TodayPrayerCard(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(Color.White.copy(alpha = 0.05f))
+                                .background(SurfaceInput)
                                 .padding(vertical = 10.dp, horizontal = 2.dp)
                         ) {
                             Text(
@@ -578,7 +570,7 @@ private fun TodayPrayerCard(
                 }
             } else {
                 Surface(
-                    color = Color.White.copy(alpha = 0.04f),
+                    color = SurfaceInput,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -604,28 +596,36 @@ fun UpdateBanner(update: com.arbdevai.quranvip.data.model.GithubRelease) {
 
     GlassCard(
         modifier = Modifier.fillMaxWidth(),
-        containerColor = Color(0xFF1E3A8A).copy(alpha = 0.1f),
-        borderColor = Color(0xFF3B82F6).copy(alpha = 0.5f)
+        containerColor = AmberSoft,
+        borderColor = AmberAccent.copy(alpha = 0.35f),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.SystemUpdate, contentDescription = null, tint = Color(0xFF60A5FA))
+                Icon(Icons.Default.SystemUpdate, contentDescription = null, tint = AmberAccent)
                 Spacer(Modifier.width(8.dp))
-                Text("Pembaruan Tersedia: ${update.name.ifBlank { update.tag_name }}", 
-                    color = Color(0xFF93C5FD), fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Pembaruan Tersedia: ${update.name.ifBlank { update.tag_name }}", 
+                    color = TextPrimary, 
+                    fontWeight = FontWeight.Bold, 
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
             Spacer(Modifier.height(8.dp))
-            Text(update.body.take(150) + if (update.body.length > 150) "..." else "", 
-                color = TextSecondary, style = MaterialTheme.typography.bodySmall)
+            Text(
+                update.body.take(150) + if (update.body.length > 150) "..." else "", 
+                color = TextSecondary, 
+                style = MaterialTheme.typography.bodySmall
+            )
             
             Spacer(Modifier.height(12.dp))
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = { showChangelog = true },
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF93C5FD)),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3B82F6).copy(alpha = 0.5f)),
-                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = AmberAccent),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, AmberAccent.copy(alpha = 0.4f)),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Apa yang Baru?", fontSize = 12.sp, fontWeight = FontWeight.Bold)
@@ -643,8 +643,8 @@ fun UpdateBanner(update: com.arbdevai.quranvip.data.model.GithubRelease) {
                             context.startActivity(intent)
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6), contentColor = Color.White),
-                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = AmberAccent, contentColor = OnAmberAccent),
+                    shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f)
                 ) {
                     Text("Update", fontSize = 12.sp, fontWeight = FontWeight.Bold)

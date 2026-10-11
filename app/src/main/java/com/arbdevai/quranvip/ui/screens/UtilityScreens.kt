@@ -398,8 +398,8 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                     Text(
                         text = dayLabel,
                         color = when (dayLabel) {
-                            "Jum" -> AmberAccent
-                            "Min" -> Color(0xFFFF6B6B)
+                            "Jum" -> CalendarFridayText
+                            "Min" -> CalendarSundayText
                             else -> TextSecondary
                         },
                         style = MaterialTheme.typography.labelSmall,
@@ -431,17 +431,17 @@ private fun CalendarGrid(state: UiState, viewModel: AppViewModel) {
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(
                                         when {
-                                            isSelected -> AmberAccent.copy(alpha = 0.4f)
-                                            isFriday -> Color(0xFF1B5E20).copy(alpha = 0.45f)
-                                            isSunday -> Color(0xFFB71C1C).copy(alpha = 0.45f)
+                                            isSelected -> AmberAccent.copy(alpha = 0.22f)
+                                            isFriday -> CalendarFridayBg
+                                            isSunday -> CalendarSundayBg
                                             else -> SurfaceCard
                                         }
                                     )
                                     .border(
-                                        width = if (isSelected || isToday) 2.dp else 0.5.dp,
+                                        width = if (isSelected || isToday) 1.5.dp else 0.5.dp,
                                         color = when {
                                             isSelected -> AmberAccent
-                                            isToday -> TextPrimary
+                                            isToday -> AmberAccent.copy(alpha = 0.8f)
                                             else -> BorderSubtle
                                         },
                                         shape = RoundedCornerShape(10.dp)
@@ -712,7 +712,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                     text = "$currentCount",
                     fontSize = 64.sp,
                     fontWeight = FontWeight.Bold,
-                    color = TextPrimary
+                    color = Color.White
                 )
                 Text(
                     text = selectedZikir,
@@ -729,7 +729,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
                 Text(
                     text = "Gunakan tombol volume (+ / -) untuk berzikir\nTahan layar 1 detik untuk buka kunci",
                     style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
+                    color = Color(0xFF94A3B8),
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 24.dp)
                 )
@@ -845,6 +845,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
             )
 
             val activeArcColor = AmberAccent
+            val trackColor = GaugeTrackColor
             Canvas(modifier = Modifier.fillMaxSize().padding(14.dp)) {
                 val strokeWidth = 16.dp.toPx()
                 val diameter = size.minDimension - strokeWidth
@@ -853,7 +854,7 @@ fun TasbihScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier = M
 
                 // Background track arc (240 degrees from 150° to 390°)
                 drawArc(
-                    color = Color(0x24FFFFFF),
+                    color = trackColor,
                     startAngle = 150f,
                     sweepAngle = 240f,
                     useCenter = false,
@@ -1080,6 +1081,14 @@ fun SettingsScreen(state: UiState, viewModel: AppViewModel, modifier: Modifier =
             singleLine = true,
             label = { Text("Zona Waktu IANA (misal: Asia/Jakarta, Asia/Makassar)") },
             shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = SurfaceInput,
+                unfocusedContainerColor = SurfaceInput,
+                focusedBorderColor = AmberAccent,
+                unfocusedBorderColor = BorderSubtle,
+                focusedTextColor = TextPrimary,
+                unfocusedTextColor = TextPrimary
+            ),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(10.dp))
@@ -1155,8 +1164,10 @@ private fun SettingSwitch(label: String, checked: Boolean, onClick: () -> Unit) 
                 checked = checked,
                 onCheckedChange = { onClick() },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = AmberAccent,
-                    checkedTrackColor = SurfacePill
+                    checkedThumbColor = OnAmberAccent,
+                    checkedTrackColor = AmberAccent,
+                    uncheckedThumbColor = TextSecondary,
+                    uncheckedTrackColor = SurfacePill
                 )
             )
         }

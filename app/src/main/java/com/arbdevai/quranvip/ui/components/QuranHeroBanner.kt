@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
@@ -32,7 +31,7 @@ fun QuranHeroBanner(
     arabicWatermark: String = "۞",
     arabicQuote: Triple<String, String, String>? = null,
     badges: List<String> = emptyList(),
-    gradientColors: List<Color> = listOf(EmeraldGradientStart, EmeraldGradientMid, EmeraldGradientEnd),
+    containerColor: Color = AmberAccent,
     trailingContent: (@Composable RowScope.() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -40,20 +39,12 @@ fun QuranHeroBanner(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(26.dp))
-            .background(Brush.linearGradient(colors = gradientColors))
+            .background(containerColor)
             .border(
-                    BorderStroke(
-                        1.2.dp,
-                        Brush.linearGradient(
-                            listOf(
-                                TextPrimary.copy(alpha = 0.40f),
-                                TextPrimary.copy(alpha = 0.15f)
-                            )
-                        )
-                    ),
+                BorderStroke(1.dp, Color.White.copy(alpha = 0.16f)),
                 RoundedCornerShape(26.dp)
             )
-            .padding(12.dp)
+            .padding(16.dp)
     ) {
         // Islamic Watermark Emblem (۞) in background
         Text(

@@ -29,11 +29,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arbdevai.quranvip.ui.theme.BorderSubtle
-import com.arbdevai.quranvip.ui.theme.SurfaceCard
-import com.arbdevai.quranvip.ui.theme.TextPrimary
-import com.arbdevai.quranvip.ui.theme.TextSecondary
-import com.arbdevai.quranvip.ui.theme.BgCanvas
+import com.arbdevai.quranvip.ui.theme.*
 
 @Composable
 fun CalmScreenTitle(
@@ -230,10 +226,10 @@ fun CalmTimeBlock(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(if (highlighted) Color(0xFFE5C378).copy(alpha = 0.14f) else Color.Transparent)
+            .background(if (highlighted) AmberSoft else Color.Transparent)
             .border(
                 0.5.dp,
-                if (highlighted) Color(0xFFE5C378).copy(alpha = 0.45f) else BorderSubtle,
+                if (highlighted) AmberAccent.copy(alpha = 0.45f) else BorderSubtle,
                 RoundedCornerShape(12.dp)
             )
             .padding(vertical = 10.dp, horizontal = 4.dp),

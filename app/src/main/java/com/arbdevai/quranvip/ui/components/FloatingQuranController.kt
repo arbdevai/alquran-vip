@@ -12,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,16 +32,7 @@ fun FloatingQuranController(
         modifier = modifier
             .padding(bottom = 20.dp)
             .border(
-                BorderStroke(
-                    1.dp,
-                    Brush.linearGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.25f),
-                            Color.White.copy(alpha = 0.05f),
-                            AmberAccent.copy(alpha = 0.35f)
-                        )
-                    )
-                ),
+                BorderStroke(1.dp, GlassBorder),
                 RoundedCornerShape(32.dp)
             )
     ) {
@@ -55,7 +45,7 @@ fun FloatingQuranController(
                 onClick = onFontDecrease,
                 shape = CircleShape,
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = Color.White.copy(alpha = 0.08f)
+                    containerColor = SurfacePill
                 ),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
             ) {
@@ -65,7 +55,7 @@ fun FloatingQuranController(
                 onClick = onFontIncrease,
                 shape = CircleShape,
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = Color.White.copy(alpha = 0.08f)
+                    containerColor = SurfacePill
                 ),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
             ) {

@@ -21,9 +21,17 @@ val AmberPressed: Color @Composable get() = if (LocalThemeIsDark.current) Color(
 val AmberSoft: Color @Composable get() = if (LocalThemeIsDark.current) Color(0x336E6BF0) else Color(0x1F5855EB)
 val OnAmberAccent: Color @Composable get() = Color.White
 
-val EmeraldGradientStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF4F46E5) else Color(0xFF5855EB)
-val EmeraldGradientMid: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF3730A3) else Color(0xFF4338CA)
-val EmeraldGradientEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF1E1B4B) else Color(0xFF312E81)
+// Solid Hero Banner Surface
+val HeroBannerBg: Color @Composable get() = AmberAccent
+
+// Calendar Special Day Colors (Subtle & Themed)
+val CalendarFridayBg: Color @Composable get() = AmberSoft
+val CalendarFridayText: Color @Composable get() = AmberAccent
+val CalendarSundayBg: Color @Composable get() = if (LocalThemeIsDark.current) Color(0x26EF5350) else Color(0x18DC2626)
+val CalendarSundayText: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFFEF5350) else Color(0xFFDC2626)
+
+// Speedometer Gauge Track
+val GaugeTrackColor: Color @Composable get() = if (LocalThemeIsDark.current) Color(0x24FFFFFF) else Color(0xFFE2E6F5)
 
 // ==========================================
 // 3. Typography
@@ -35,19 +43,8 @@ val TextSecondary: Color @Composable get() = if (LocalThemeIsDark.current) Color
 val TextPlaceholder: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF475569) else Color(0xFFCBD5E1)
 
 // ==========================================
-// 4. Feature Tiles (#5855EB Harmonic Gradient Family)
+// 4. Feature Tiles & Components (Solid Tonal)
 // ==========================================
-val TileQuranStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF6366F1) else Color(0xFF5855EB)
-val TileQuranEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF4338CA) else Color(0xFF3730A3)
-val TileJadwalStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF818CF8) else Color(0xFF6366F1)
-val TileJadwalEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF4F46E5) else Color(0xFF4338CA)
-val TileTasbihStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFFA855F7) else Color(0xFF7C3AED)
-val TileTasbihEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF6366F1) else Color(0xFF5855EB)
-val TileBookmarkStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF4F46E5) else Color(0xFF4338CA)
-val TileBookmarkEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF312E81) else Color(0xFF1E1B4B)
-val TileSettingsStart: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF64748B) else Color(0xFF475569)
-val TileSettingsEnd: Color @Composable get() = if (LocalThemeIsDark.current) Color(0xFF334155) else Color(0xFF1E293B)
-
 val CatJadwal: Color @Composable get() = AmberAccent
 
 val GlassBackground: Color @Composable get() = SurfaceCard
